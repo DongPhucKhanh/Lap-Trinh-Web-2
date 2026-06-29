@@ -1,0 +1,143 @@
+.user-main-content {
+  background: #f1f5f9;
+  min-height: calc(100vh - 300px);
+  padding: 3rem 0;
+}
+
+.user-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  gap: 2.5rem;
+}
+
+@media (max-width: 900px) {
+  .user-container {
+    flex-direction: column;
+  }
+}
+
+/* SIDEBAR */
+.user-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  height: fit-content;
+}
+
+@media (max-width: 900px) {
+  .user-sidebar {
+    width: 100%;
+  }
+}
+
+.user-sidebar-header {
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.user-avatar-large {
+  width: 60px;
+  height: 60px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.user-brief h4 {
+  margin: 0 0 0.25rem 0;
+  color: var(--dark);
+  font-size: 1.1rem;
+}
+
+.user-brief p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.user-nav {
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  color: var(--text-main);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition-fast);
+  border-left: 3px solid transparent;
+  background: transparent;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.user-nav-item:hover {
+  background: #f8fafc;
+  color: var(--primary);
+}
+
+.user-nav-item.active {
+  background: #fef2f2;
+  color: var(--primary);
+  border-left-color: var(--primary);
+}
+
+.logout-btn-sidebar {
+  margin-top: 1rem;
+  border-top: 1px dashed #e2e8f0;
+  padding-top: 1.5rem;
+  color: #ef4444;
+}
+
+.logout-btn-sidebar:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+/* VIEW AREA */
+.user-view-area {
+  flex-grow: 1;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 2.5rem;
+  overflow: hidden; /* For animation */
+}
+
+/* ANIMATION */
+.tab-content-wrapper {
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.fade-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+}

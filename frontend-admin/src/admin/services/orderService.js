@@ -5,7 +5,9 @@ const orderServiceService = {
   getById: (id) => api.get('/orders/' + id),
   create: (data) => api.post('/orders', data),
   update: (id, data) => api.put('/orders/' + id, data),
-  delete: (id) => api.delete('/orders/' + id)
+  updateStatus: (id, data) => api.put('/orders/' + id + '/status', data),
+  delete: (id) => api.delete('/orders/' + id),
+  deleteItem: (orderId, itemId, reason) => api.delete(`/orders/${orderId}/items/${itemId}`, { data: { reason } })
 };
 
 export default orderServiceService;

@@ -15,6 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import com.dongphuckhanh.ltw2.service.EmailService;
+import com.dongphuckhanh.ltw2.service.OtpService;
 
 import java.util.Map;
 
@@ -33,6 +35,12 @@ public class AuthController {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private OtpService otpService;
 
     // ================================================================
     // ĐĂNG NHẬP
@@ -67,13 +75,22 @@ public class AuthController {
             // Lấy thông tin user từ DB để trả về response đầy đủ
             User user = userRepository.findByUsername(loginRequest.getUsername()).orElseThrow();
 
+            // Chặn đăng nhập nếu ROLE_USER chưa xác thực (status = 0)
+            // Tài khoản ROLE_ADMIN không cần xác thực OTP
+            if (user.getStatus() != null && user.getStatus() == 0
+                    && user.getRoles() != null && !user.getRoles().contains("ROLE_ADMIN")) {
+                return ResponseEntity.status(403)
+                        .body(Map.of("message", "Tài khoản chưa được xác thực. Vui lòng kiểm tra email để lấy mã OTP!"));
+            }
+
             return ResponseEntity.ok(new JwtResponse(
                     jwt,
                     user.getId(),
                     user.getUsername(),
                     user.getName(),
                     user.getEmail(),
-                    user.getRoles()
+                    user.getRoles(),
+                    user.getAvatar()
             ));
 
         } catch (BadCredentialsException e) {
@@ -125,14 +142,82 @@ public class AuthController {
         user.setPhone(registerRequest.getPhone());
         user.setGender(registerRequest.getGender());
         user.setRoles("ROLE_USER"); // Mặc định tất cả user mới là ROLE_USER
+        user.setStatus(0); // Chưa kích hoạt
 
         User savedUser = userRepository.save(user);
 
+        // Gửi OTP xác thực qua email
+        if (registerRequest.getEmail() != null && !registerRequest.getEmail().isBlank()) {
+            String otp = otpService.generateOtp(registerRequest.getEmail());
+            emailService.sendRegistrationOtp(registerRequest.getEmail(), otp);
+        }
+
         return ResponseEntity.ok(Map.of(
-                "message", "Đăng ký thành công!",
+                "message", "Đăng ký thành công! Vui lòng kiểm tra email để lấy mã OTP xác thực tài khoản.",
                 "userId", savedUser.getId(),
                 "username", savedUser.getUsername()
         ));
+    }
+
+    // ================================================================
+    // XÁC THỰC TÀI KHOẢN (OTP)
+    // POST /api/auth/verify-account
+    // Body: { "email": "...", "otp": "..." }
+    // ================================================================
+    @PostMapping("/verify-account")
+    public ResponseEntity<?> verifyAccount(@RequestBody com.dongphuckhanh.ltw2.dto.OtpVerifyRequest request) {
+        String email = request.getEmail();
+        String otp = request.getOtp();
+
+        if (email == null || otp == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Thiếu thông tin email hoặc mã OTP."));
+        }
+
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Không tìm thấy tài khoản với email này."));
+        }
+
+        if (user.getStatus() != null && user.getStatus() == 1) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Tài khoản này đã được xác thực trước đó."));
+        }
+
+        boolean isValid = otpService.verifyOtp(email, otp);
+        if (isValid) {
+            user.setStatus(1);
+            userRepository.save(user);
+            otpService.clearOtp(email);
+            return ResponseEntity.ok(Map.of("message", "Xác thực tài khoản thành công! Bạn có thể đăng nhập ngay."));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("message", "Mã OTP không hợp lệ hoặc đã hết hạn."));
+        }
+    }
+
+    // ================================================================
+    // GỬI LẠI OTP XÁC THỰC TÀI KHOẢN
+    // POST /api/auth/resend-otp
+    // Body: { "email": "..." }
+    // ================================================================
+    @PostMapping("/resend-otp")
+    public ResponseEntity<?> resendOtp(@RequestBody com.dongphuckhanh.ltw2.dto.OtpRequest request) {
+        String email = request.getEmail();
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Email không được để trống!"));
+        }
+
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Không tìm thấy tài khoản với email này."));
+        }
+
+        try {
+            String otp = otpService.generateOtp(email);
+            emailService.sendRegistrationOtp(email, otp);
+            return ResponseEntity.ok(Map.of("message", "Mã OTP mới đã được gửi đến email của bạn."));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("message", "Lỗi khi gửi email OTP. Vui lòng thử lại sau."));
+        }
     }
 
     // ================================================================
@@ -186,14 +271,97 @@ public class AuthController {
 
         String username = authentication.getName();
         return userRepository.findByUsername(username)
-                .<ResponseEntity<?>>map(user -> ResponseEntity.ok(Map.of(
-                        "id", user.getId(),
-                        "username", user.getUsername(),
-                        "name", user.getName(),
-                        "email", user.getEmail() != null ? user.getEmail() : "",
-                        "roles", user.getRoles(),
-                        "status", user.getStatus()
-                )))
+                .<ResponseEntity<?>>map(user -> {
+                    java.util.Map<String, Object> response = new java.util.HashMap<>();
+                    response.put("id", user.getId());
+                    response.put("username", user.getUsername());
+                    response.put("name", user.getName());
+                    response.put("email", user.getEmail());
+                    response.put("phone", user.getPhone());
+                    response.put("address", user.getAddress());
+                    response.put("gender", user.getGender());
+                    response.put("roles", user.getRoles());
+                    response.put("status", user.getStatus());
+                    response.put("avatar", user.getAvatar());
+                    return ResponseEntity.ok(response);
+                })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    // ================================================================
+    // QUÊN MẬT KHẨU - YÊU CẦU OTP
+    // POST /api/auth/forgot-password/request
+    // Body: { "email": "..." }
+    // ================================================================
+    @PostMapping("/forgot-password/request")
+    public ResponseEntity<?> requestOtp(@RequestBody com.dongphuckhanh.ltw2.dto.OtpRequest request) {
+        String email = request.getEmail();
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Email không được để trống!"));
+        }
+        
+        if (!userRepository.existsByEmail(email)) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Không tìm thấy tài khoản với email này!"));
+        }
+
+        try {
+            String otp = otpService.generateOtp(email);
+            emailService.sendForgotPasswordOtp(email, otp);
+            return ResponseEntity.ok(Map.of("message", "Mã OTP đã được gửi đến email của bạn."));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("message", "Lỗi khi gửi email OTP. Vui lòng thử lại sau."));
+        }
+    }
+
+    // ================================================================
+    // QUÊN MẬT KHẨU - XÁC THỰC OTP
+    // POST /api/auth/forgot-password/verify
+    // Body: { "email": "...", "otp": "..." }
+    // ================================================================
+    @PostMapping("/forgot-password/verify")
+    public ResponseEntity<?> verifyOtp(@RequestBody com.dongphuckhanh.ltw2.dto.OtpVerifyRequest request) {
+        String email = request.getEmail();
+        String otp = request.getOtp();
+        
+        if (email == null || otp == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Thiếu thông tin email hoặc mã OTP."));
+        }
+
+        boolean isValid = otpService.verifyOtp(email, otp);
+        if (isValid) {
+            return ResponseEntity.ok(Map.of("message", "Xác thực OTP thành công."));
+        } else {
+            return ResponseEntity.badRequest().body(Map.of("message", "Mã OTP không hợp lệ hoặc đã hết hạn."));
+        }
+    }
+
+    // ================================================================
+    // QUÊN MẬT KHẨU - ĐẶT LẠI MẬT KHẨU
+    // POST /api/auth/forgot-password/reset
+    // Body: { "email": "...", "newPassword": "..." }
+    // ================================================================
+    @PostMapping("/forgot-password/reset")
+    public ResponseEntity<?> resetPassword(@RequestBody com.dongphuckhanh.ltw2.dto.ResetPasswordRequest request) {
+        String email = request.getEmail();
+        String newPassword = request.getNewPassword();
+
+        if (email == null || newPassword == null || newPassword.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Thiếu thông tin email hoặc mật khẩu mới."));
+        }
+
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Không tìm thấy người dùng."));
+        }
+
+        // Lưu mật khẩu mới đã mã hóa
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        // Xóa OTP khỏi bộ nhớ
+        otpService.clearOtp(email);
+
+        return ResponseEntity.ok(Map.of("message", "Đặt lại mật khẩu thành công. Bạn có thể đăng nhập ngay."));
     }
 }

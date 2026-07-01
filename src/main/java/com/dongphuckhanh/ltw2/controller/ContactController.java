@@ -6,6 +6,8 @@ import com.dongphuckhanh.ltw2.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.dongphuckhanh.ltw2.service.EmailService;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,12 @@ public class ContactController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Value("${spring.mail.username}")
+    private String adminEmail;
 
     // 1. Lấy tất cả liên hệ (dành cho Admin)
     @GetMapping
@@ -67,6 +75,18 @@ public class ContactController {
         }
 
         Contact saved = contactRepository.save(contact);
+
+        // Gửi email
+        if (saved.getEmail() != null && !saved.getEmail().isBlank()) {
+            // 1. Email cảm ơn gửi cho khách
+            emailService.sendContactThankYou(saved.getEmail(), saved.getName());
+            
+            // 2. Email thông báo cho Admin
+            if (adminEmail != null && !adminEmail.isBlank()) {
+                emailService.sendContactNoticeToAdmin(adminEmail, saved);
+            }
+        }
+
         return ResponseEntity.ok(saved);
     }
 

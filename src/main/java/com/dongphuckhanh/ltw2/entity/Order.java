@@ -58,15 +58,22 @@ public class Order {
      * Trạng thái đơn hàng:
      * 0 = Chờ xác nhận
      * 1 = Đã xác nhận
-     * 2 = Đang giao
-     * 3 = Giao thành công
-     * 4 = Đã hủy
+     * 2 = Đang chuẩn bị
+     * 3 = Đang giao
+     * 4 = Đã giao
+     * 5 = Hoàn thành
+     * 6 = Đã hủy
+     * 7 = Hoàn tiền
      */
     @Column(columnDefinition = "INT DEFAULT 0")
     private Integer status;
 
+    /** Lý do hủy hoặc hoàn tiền (nếu có) */
+    @Column(name = "cancel_reason", columnDefinition = "TEXT")
+    private String cancelReason;
+
     /** Danh sách chi tiết sản phẩm trong đơn hàng */
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderDetail> orderDetails;
 
     @PrePersist

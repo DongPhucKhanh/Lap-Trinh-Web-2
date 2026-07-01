@@ -26,6 +26,7 @@ public class ProductStore {
     /** Quan hệ 1-1 với Product, cột khóa ngoại là 'product_id' */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false, unique = true)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Product product;
 
     /** Giá gốc (giá nhập kho) */

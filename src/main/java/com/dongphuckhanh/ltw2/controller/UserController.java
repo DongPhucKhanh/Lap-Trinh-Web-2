@@ -56,11 +56,31 @@ public class UserController {
             user.setGender(userDetails.getGender());
             user.setStatus(userDetails.getStatus());
             user.setRoles(userDetails.getRoles());
+            user.setAvatar(userDetails.getAvatar());
             // Update password if provided
             if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
                 user.setPassword(passwordEncoder.encode(userDetails.getPassword()));
             }
             return ResponseEntity.ok(userRepository.save(user));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/change-password")
+    public ResponseEntity<?> changePassword(@PathVariable Long id, @RequestBody java.util.Map<String, String> payload) {
+        String oldPassword = payload.get("oldPassword");
+        String newPassword = payload.get("newPassword");
+        
+        if (oldPassword == null || newPassword == null || newPassword.isEmpty()) {
+            return ResponseEntity.badRequest().body("Vui lòng nhập đầy đủ mật khẩu cũ và mật khẩu mới.");
+        }
+        
+        return userRepository.findById(id).map(user -> {
+            if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+                return ResponseEntity.badRequest().body("Mật khẩu hiện tại không đúng!");
+            }
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            return ResponseEntity.ok("Đổi mật khẩu thành công!");
         }).orElse(ResponseEntity.notFound().build());
     }
 

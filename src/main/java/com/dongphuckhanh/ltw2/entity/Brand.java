@@ -16,6 +16,7 @@ import java.util.List;
 @Builder
 // Loại bỏ circular reference trong toString khi có quan hệ với Product
 @ToString(exclude = "products")
+@EqualsAndHashCode(exclude = "products")
 public class Brand {
 
     @Id
@@ -55,6 +56,7 @@ public class Brand {
 
     /** Một Brand có nhiều Product */
     @OneToMany(mappedBy = "brand", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Product> products;
 
     @PrePersist

@@ -25,6 +25,7 @@ public class OrderDetail {
     /** Đơn hàng mà dòng này thuộc về */
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Order order;
 
     /** Sản phẩm trong dòng đơn hàng này */

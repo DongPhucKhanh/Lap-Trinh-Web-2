@@ -25,6 +25,19 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     boolean existsBySlugAndIdNot(String slug, Long id);
 
+    /** Tìm tất cả sản phẩm khác trạng thái cụ thể (vd: khác -1) */
+    Page<Product> findByStatusNot(Integer status, Pageable pageable);
+    List<Product> findByStatusNot(Integer status);
+
+    /** Tìm tất cả sản phẩm theo trạng thái cụ thể (vd: bằng -1) */
+    Page<Product> findByStatus(Integer status, Pageable pageable);
+    List<Product> findByStatus(Integer status);
+
+    /** Tìm kiếm cho Admin bỏ qua trạng thái xóa mềm (-1) */
+    Page<Product> findByNameContainingIgnoreCaseAndCategoryIdAndStatusNot(String name, Long categoryId, Integer status, Pageable pageable);
+    Page<Product> findByNameContainingIgnoreCaseAndStatusNot(String name, Integer status, Pageable pageable);
+    Page<Product> findByCategoryIdAndStatusNot(Long categoryId, Integer status, Pageable pageable);
+
     /** Tìm sản phẩm theo CategoryId và trạng thái, có phân trang */
     Page<Product> findByCategoryIdAndStatus(Long categoryId, Integer status, Pageable pageable);
 
@@ -33,6 +46,18 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     /** Tìm sản phẩm theo CategoryId không phân trang (dùng cho admin) */
     List<Product> findByCategoryId(Long categoryId);
+    
+    /** Tìm sản phẩm theo BrandId không phân trang (dùng cho admin) */
+    List<Product> findByBrandId(Long brandId);
+
+    /** Tìm sản phẩm theo tên (không phân biệt hoa/thường), có phân trang */
+    Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
+
+    /** Tìm sản phẩm theo CategoryId, có phân trang */
+    Page<Product> findByCategoryId(Long categoryId, Pageable pageable);
+
+    /** Tìm sản phẩm theo tên và CategoryId, có phân trang */
+    Page<Product> findByNameContainingIgnoreCaseAndCategoryId(String name, Long categoryId, Pageable pageable);
 
     /** Tìm kiếm full-text theo tên sản phẩm */
     @Query("SELECT p FROM Product p WHERE p.status = 1 AND LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")

@@ -44,6 +44,7 @@ import PostList from '../pages/Post/PostList';
 import PostCreate from '../pages/Post/PostCreate';
 import PostEdit from '../pages/Post/PostEdit';
 import PostTrash from '../pages/Post/PostTrash';
+import PostShow from '../pages/Post/PostShow';
 
 // Topic
 import TopicList from '../pages/Topic/TopicList';
@@ -121,6 +122,7 @@ const AdminRoutes = () => {
           <Route index element={<PostList />} />
           <Route path="create" element={<PostCreate />} />
           <Route path="edit/:id" element={<PostEdit />} />
+          <Route path="show/:id" element={<PostShow />} />
           <Route path="trash" element={<PostTrash />} />
         </Route>
 

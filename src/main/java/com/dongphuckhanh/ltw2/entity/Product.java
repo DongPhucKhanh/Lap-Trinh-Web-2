@@ -52,6 +52,14 @@ public class Product {
     @Column(length = 500)
     private String image;
 
+    /** Danh sách ảnh phụ, lưu chuỗi JSON hoặc cách nhau bằng dấu phẩy */
+    @Column(columnDefinition = "TEXT")
+    private String gallery;
+
+    /** Sản phẩm nổi bật (1 = nổi bật, 0 = bình thường) */
+    @Column(name = "is_featured", columnDefinition = "TINYINT DEFAULT 0")
+    private Boolean isFeatured;
+
     /** Giá bán niêm yết */
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal price;
@@ -73,13 +81,11 @@ public class Product {
     private Integer status;
 
     /** Thông tin tồn kho (quan hệ 1-1) */
-    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private ProductStore productStore;
 
     /** Thông tin khuyến mãi (quan hệ 1-1) */
-    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private ProductSale productSale;
 
     /** Danh sách chi tiết đơn hàng chứa sản phẩm này */

@@ -2,10 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { Bookmark, Trash2, Plus, Edit } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import categoryService from '../../services/categoryService';
+import Pagination from '../../components/Pagination/Pagination';
 
 const CategoryList = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(categories.length / itemsPerPage);
+  const paginatedCategories = categories.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const fetchCategories = () => {
     setLoading(true);
@@ -28,7 +35,7 @@ const CategoryList = () => {
     if (window.confirm('Bạn có chắc chắn muốn xoá danh mục này? Việc này có thể ảnh hưởng đến các sản phẩm bên trong!')) {
       categoryService.delete(id)
         .then(() => fetchCategories())
-        .catch(err => alert('Có lỗi xảy ra: ' + err.message));
+        .catch(err => alert('Có lỗi xảy ra: ' + (err.response?.data || err.message)));
     }
   };
 
@@ -43,10 +50,12 @@ const CategoryList = () => {
 
       <div className="table-container">
         {loading ? <div className="loader"></div> : (
+          <>
           <table className="admin-table">
             <thead>
               <tr>
                 <th>ID</th>
+                <th>Hình ảnh</th>
                 <th>Tên danh mục</th>
                 <th>Slug</th>
                 <th>Trạng thái</th>
@@ -54,9 +63,16 @@ const CategoryList = () => {
               </tr>
             </thead>
             <tbody>
-              {categories.map(c => (
+              {paginatedCategories.map(c => (
                 <tr key={c.id}>
                   <td>#{c.id}</td>
+                  <td>
+                    {c.image ? (
+                      <img src={c.image.startsWith('http') ? c.image : `http://localhost:8080/uploads/${c.image}`} alt={c.name} style={{width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px'}} />
+                    ) : (
+                      <span className="text-muted">Không có ảnh</span>
+                    )}
+                  </td>
                   <td><strong>{c.name}</strong></td>
                   <td className="text-muted">{c.slug}</td>
                   <td>
@@ -79,6 +95,12 @@ const CategoryList = () => {
               )}
             </tbody>
           </table>
+          <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+          </>
         )}
       </div>
     </div>

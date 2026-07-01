@@ -6,7 +6,26 @@ import topicService from '../../services/topicService';
 const TopicCreate = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({ name: '', title: '', status: 1 });
+  const [formData, setFormData] = useState({ name: '', slug: '', title: '', status: 1 });
+
+  const generateSlug = (name) => {
+    return name.toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[đĐ]/g, "d")
+      .replace(/([^0-9a-z-\s])/g, '')
+      .replace(/(\s+)/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
+
+  const handleNameChange = (e) => {
+    setFormData({
+      ...formData,
+      name: e.target.value,
+      title: e.target.value,
+      slug: generateSlug(e.target.value)
+    });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -26,7 +45,11 @@ const TopicCreate = () => {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Tên / Tiêu đề <span className="text-red">*</span></label>
-            <input required type="text" onChange={e => setFormData({...formData, name: e.target.value, title: e.target.value})} />
+            <input required type="text" onChange={handleNameChange} value={formData.name} />
+          </div>
+          <div className="form-group">
+            <label>Đường dẫn (Slug) <span className="text-red">*</span></label>
+            <input required type="text" value={formData.slug} onChange={e => setFormData({...formData, slug: e.target.value})} />
           </div>
           <div className="form-actions">
             <Link to="/admin/topic" className="btn-secondary">Hủy</Link>

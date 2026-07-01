@@ -94,6 +94,9 @@ public class SecurityConfig {
                     "/error"
                 ).permitAll()
 
+                // --- KHÁCH VÃNG LAI có thể gửi form liên hệ ---
+                .requestMatchers(HttpMethod.POST, "/api/contacts").permitAll()
+
                 // --- MỌI request còn lại phải có JWT token ---
                 .anyRequest().authenticated()
             );

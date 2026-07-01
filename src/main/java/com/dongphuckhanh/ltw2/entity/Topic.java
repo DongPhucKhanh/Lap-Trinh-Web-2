@@ -53,6 +53,7 @@ public class Topic {
 
     /** Một Topic có thể có nhiều Post */
     @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Post> posts;
 
     @PrePersist

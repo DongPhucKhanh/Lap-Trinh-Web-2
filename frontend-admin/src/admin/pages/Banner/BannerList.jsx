@@ -2,10 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { FileText, Trash2, Plus, Edit } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import bannerService from '../../services/bannerService';
+import Pagination from '../../components/Pagination/Pagination';
 
 const BannerList = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const paginatedData = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const fetchData = () => {
     setLoading(true);
@@ -28,12 +35,16 @@ const BannerList = () => {
       </div>
       <div className="table-container">
         {loading ? <div className="loader"></div> : (
+          <>
           <table className="admin-table">
-            <thead><tr><th>ID</th><th>Thông tin</th><th>Thao tác</th></tr></thead>
+            <thead><tr><th>ID</th><th>Hình ảnh</th><th>Thông tin</th><th>Thao tác</th></tr></thead>
             <tbody>
-              {data.map(item => (
+              {paginatedData.map(item => (
                 <tr key={item.id}>
                   <td>#{item.id}</td>
+                  <td>
+                    <img src={item.image ? (item.image.startsWith('http') ? item.image : `http://localhost:8080/uploads/${item.image}`) : 'https://via.placeholder.com/50'} alt="banner" style={{ width: '80px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
+                  </td>
                   <td>{item.name || item.title || item.username || item.fullname || 'No Data'}</td>
                   <td>
                     <div className="action-btns">
@@ -43,9 +54,15 @@ const BannerList = () => {
                   </td>
                 </tr>
               ))}
-              {data.length === 0 && <tr><td colSpan="3" className="text-center py-4">Chưa có dữ liệu.</td></tr>}
+              {data.length === 0 && <tr><td colSpan="4" className="text-center py-4">Chưa có dữ liệu.</td></tr>}
             </tbody>
           </table>
+          <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+          </>
         )}
       </div>
     </div>

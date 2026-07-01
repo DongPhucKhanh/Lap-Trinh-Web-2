@@ -27,6 +27,7 @@ public class ProductSale {
     /** Quan hệ 1-1 với Product */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false, unique = true)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Product product;
 
     /** Giá khuyến mãi */

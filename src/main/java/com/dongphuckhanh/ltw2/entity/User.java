@@ -15,8 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = "orders")
-@EqualsAndHashCode(exclude = "orders")
+@ToString(exclude = {"orders", "contacts"})
+@EqualsAndHashCode(exclude = {"orders", "contacts"})
 public class User {
 
     @Id
@@ -54,6 +54,9 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String address;
 
+    @Column(length = 255)
+    private String avatar;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -66,11 +69,21 @@ public class User {
 
     /** Một User có thể có nhiều Order */
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Order> orders;
 
     /** Một User có thể gửi nhiều Contact */
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Contact> contacts;
+
+    /** Danh sách sản phẩm yêu thích (Wishlist) */
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_favorite",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "product_id"))
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private List<Product> favoriteProducts;
 
     @PrePersist
     protected void onCreate() {

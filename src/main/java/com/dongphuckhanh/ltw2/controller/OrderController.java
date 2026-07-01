@@ -10,6 +10,7 @@ import com.dongphuckhanh.ltw2.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.dongphuckhanh.ltw2.service.EmailService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -32,6 +33,9 @@ public class OrderController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     // ============================================================
     // 1. Lấy tất cả đơn hàng (dành cho Admin)
@@ -134,6 +138,20 @@ public class OrderController {
 
             Product product = productOpt.get();
             BigDecimal price = product.getPrice();
+            if (product.getProductSale() != null && product.getProductSale().getPricesale() != null) {
+                price = product.getProductSale().getPricesale();
+            }
+
+            if (product.getProductStore() != null) {
+                int currentQty = product.getProductStore().getQty();
+                if (currentQty < qty) {
+                    orderRepository.delete(savedOrder);
+                    return ResponseEntity.badRequest()
+                            .body("Sản phẩm " + product.getName() + " không đủ số lượng!");
+                }
+                product.getProductStore().setQty(currentQty - qty);
+                productRepository.save(product);
+            }
 
             OrderDetail detail = new OrderDetail();
             detail.setOrder(savedOrder);
@@ -147,6 +165,11 @@ public class OrderController {
 
         orderDetailRepository.saveAll(detailList);
 
+        // Gửi email xác nhận đơn hàng
+        if (savedOrder.getDeliveryEmail() != null && !savedOrder.getDeliveryEmail().isBlank()) {
+            emailService.sendOrderConfirmation(savedOrder.getDeliveryEmail(), savedOrder, detailList);
+        }
+
         return ResponseEntity.ok(savedOrder);
     }
 
@@ -156,16 +179,28 @@ public class OrderController {
     // ============================================================
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateOrderStatus(@PathVariable Long id,
-                                                @RequestBody Map<String, Integer> body) {
-        Integer newStatus = body.get("status");
-        if (newStatus == null) {
+                                                @RequestBody Map<String, Object> body) {
+        Object statusObj = body.get("status");
+        if (statusObj == null) {
             return ResponseEntity.badRequest().body("Vui lòng truyền trường 'status'");
         }
+        Integer newStatus = Integer.valueOf(statusObj.toString());
+        String cancelReason = body.get("cancelReason") != null ? body.get("cancelReason").toString() : null;
 
         return orderRepository.findById(id)
                 .map(order -> {
                     order.setStatus(newStatus);
-                    return ResponseEntity.ok(orderRepository.save(order));
+                    if (newStatus == 6 || newStatus == 7) {
+                        order.setCancelReason(cancelReason);
+                    }
+                    Order updatedOrder = orderRepository.save(order);
+                    
+                    // Gửi email thông báo thay đổi trạng thái
+                    if (updatedOrder.getDeliveryEmail() != null && !updatedOrder.getDeliveryEmail().isBlank()) {
+                        emailService.sendOrderStatusChange(updatedOrder.getDeliveryEmail(), updatedOrder, newStatus);
+                    }
+                    
+                    return ResponseEntity.ok(updatedOrder);
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -180,5 +215,47 @@ public class OrderController {
         }
         orderRepository.deleteById(id);
         return ResponseEntity.ok("Đã xóa đơn hàng thành công!");
+    }
+
+    // ============================================================
+    // 7. Xóa 1 sản phẩm trong đơn hàng (khi hàng lỗi/hết hàng)
+    //    Body JSON: { "reason": "Lý do xóa..." }
+    // ============================================================
+    @DeleteMapping("/{orderId}/items/{itemId}")
+    public ResponseEntity<?> deleteOrderItem(@PathVariable Long orderId, 
+                                             @PathVariable Long itemId,
+                                             @RequestBody Map<String, String> payload) {
+        String reason = payload.get("reason");
+        if (reason == null || reason.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Vui lòng cung cấp lý do xóa sản phẩm.");
+        }
+        
+        Optional<Order> orderOpt = orderRepository.findById(orderId);
+        if (orderOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Order order = orderOpt.get();
+        
+        Optional<OrderDetail> itemOpt = orderDetailRepository.findById(itemId);
+        if (itemOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        OrderDetail item = itemOpt.get();
+        
+        // Ensure the item belongs to the order
+        if (!item.getOrder().getId().equals(orderId)) {
+            return ResponseEntity.badRequest().body("Sản phẩm không thuộc đơn hàng này.");
+        }
+        
+        // Gửi email thông báo cho khách hàng
+        if (order.getDeliveryEmail() != null && !order.getDeliveryEmail().isBlank()) {
+            emailService.sendItemCancellationNotice(order.getDeliveryEmail(), order, item, reason);
+        }
+        
+        // Xóa sản phẩm khỏi DB và khỏi danh sách của order
+        order.getOrderDetails().remove(item);
+        orderDetailRepository.delete(item);
+        
+        return ResponseEntity.ok(order);
     }
 }

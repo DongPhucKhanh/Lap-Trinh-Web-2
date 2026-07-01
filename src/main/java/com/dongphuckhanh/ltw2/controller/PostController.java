@@ -26,6 +26,14 @@ public class PostController {
         return ResponseEntity.ok(postRepository.findAll());
     }
 
+    // Lấy bài viết theo slug
+    @GetMapping("/slug/{slug}")
+    public ResponseEntity<Post> getPostBySlug(@PathVariable String slug) {
+        return postRepository.findBySlug(slug)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     // 2. Lấy bài viết theo ID
     @GetMapping("/{id}")
     public ResponseEntity<Post> getPostById(@PathVariable Long id) {
@@ -56,8 +64,14 @@ public class PostController {
                 topicRepository.findById(post.getTopic().getId());
 
         if (topicOptional.isPresent()) {
-            post.setTopic(topicOptional.get());
-            return ResponseEntity.ok(postRepository.save(post));
+            try {
+                post.setTopic(topicOptional.get());
+                return ResponseEntity.ok(postRepository.save(post));
+            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                return ResponseEntity.badRequest().body("Lỗi SQL: " + e.getMostSpecificCause().getMessage());
+            } catch (Exception e) {
+                return ResponseEntity.internalServerError().body("Lỗi máy chủ: " + e.getMessage());
+            }
         } else {
             return ResponseEntity.badRequest().body("Chủ đề không tồn tại!");
         }

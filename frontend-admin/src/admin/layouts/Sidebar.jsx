@@ -1,9 +1,18 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Package, Users, Settings, LogOut, Tag, Bookmark, FileText, ShoppingCart, MessageSquare, Image, Menu } from 'lucide-react';
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminInfo');
+      navigate('/login');
+    }
+  };
 
   const navItems = [
     { path: '/admin', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
@@ -37,7 +46,7 @@ const Sidebar = () => {
         ))}
       </nav>
       <div className="sidebar-footer">
-        <button className="logout-btn">
+        <button className="logout-btn" onClick={handleLogout}>
           <LogOut size={20} /> Đăng Xuất
         </button>
       </div>
@@ -46,3 +55,4 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
+

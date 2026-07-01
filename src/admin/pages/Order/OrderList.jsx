@@ -2,10 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { FileText, Trash2, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import orderService from '../../services/orderService';
+import Pagination from '../../components/Pagination/Pagination';
 
 const OrderList = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const paginatedData = data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const fetchData = () => {
     setLoading(true);
@@ -73,6 +80,7 @@ const OrderList = () => {
       </div>
       <div className="table-container">
         {loading ? <div className="loader"></div> : (
+          <>
           <table className="admin-table">
             <thead>
               <tr>
@@ -85,7 +93,7 @@ const OrderList = () => {
               </tr>
             </thead>
             <tbody>
-              {data.map(item => (
+              {paginatedData.map(item => (
                 <tr key={item.id}>
                   <td><strong>#{item.id}</strong></td>
                   <td>{item.createdAt ? new Date(item.createdAt).toLocaleString('vi-VN') : ''}</td>
@@ -118,6 +126,12 @@ const OrderList = () => {
               {data.length === 0 && <tr><td colSpan="6" className="text-center py-4">Chưa có đơn hàng nào.</td></tr>}
             </tbody>
           </table>
+          <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+          </>
         )}
       </div>
     </div>

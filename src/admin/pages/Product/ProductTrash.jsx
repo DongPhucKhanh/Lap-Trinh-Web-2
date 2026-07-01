@@ -2,10 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { Package, Trash2, ArrowLeft, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
+import Pagination from '../../components/Pagination/Pagination';
 
 const ProductTrash = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const paginatedProducts = products.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const fetchTrash = () => {
     setLoading(true);
@@ -43,6 +50,7 @@ const ProductTrash = () => {
 
       <div className="table-container">
         {loading ? <div className="loader"></div> : (
+          <>
           <table className="admin-table">
             <thead>
               <tr>
@@ -55,7 +63,7 @@ const ProductTrash = () => {
               </tr>
             </thead>
             <tbody>
-              {products.map(p => (
+              {paginatedProducts.map(p => (
                 <tr key={p.id}>
                   <td>#{p.id}</td>
                   <td>
@@ -80,6 +88,12 @@ const ProductTrash = () => {
               )}
             </tbody>
           </table>
+          <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+          </>
         )}
       </div>
     </div>

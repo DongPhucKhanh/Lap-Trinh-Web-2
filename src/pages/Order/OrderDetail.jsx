@@ -30,9 +30,13 @@ const OrderDetail = () => {
   const getStatusDisplay = (status) => {
     switch(status) {
       case 0: return { icon: <Clock size={16}/>, text: 'Chờ xác nhận', class: 'status-pending' };
-      case 1: return { icon: <Truck size={16}/>, text: 'Đang giao hàng', class: 'status-delivering' };
-      case 2: return { icon: <CheckCircle size={16}/>, text: 'Đã hoàn thành', class: 'status-completed' };
-      case 3: return { icon: <XCircle size={16}/>, text: 'Đã hủy', class: 'status-cancelled' };
+      case 1: return { icon: <CheckCircle size={16}/>, text: 'Đã xác nhận', class: 'status-completed' };
+      case 2: return { icon: <Clock size={16}/>, text: 'Đang chuẩn bị', class: 'status-pending' };
+      case 3: return { icon: <Truck size={16}/>, text: 'Đang giao hàng', class: 'status-delivering' };
+      case 4: return { icon: <CheckCircle size={16}/>, text: 'Đã giao hàng', class: 'status-completed' };
+      case 5: return { icon: <CheckCircle size={16}/>, text: 'Hoàn thành', class: 'status-completed' };
+      case 6: return { icon: <XCircle size={16}/>, text: 'Đã hủy', class: 'status-cancelled' };
+      case 7: return { icon: <XCircle size={16}/>, text: 'Hoàn tiền', class: 'status-cancelled' };
       default: return { icon: <Clock size={16}/>, text: 'Không xác định', class: 'status-pending' };
     }
   };

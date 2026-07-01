@@ -120,7 +120,13 @@ const ProductDetail = () => {
     ? (product.image.startsWith('http') ? product.image : `http://localhost:8080/uploads/${product.image}`)
     : 'https://placehold.co/600x400/f4f7f6/636e72?text=Snack';
 
-  const gallery = [mainImageUrl];
+  let gallery = [mainImageUrl];
+  if (product.gallery) {
+    const extraImages = product.gallery.split(',').filter(x => x).map(img => 
+      img.startsWith('http') ? img : `http://localhost:8080/uploads/${img}`
+    );
+    gallery = [...gallery, ...extraImages];
+  }
 
   const breadcrumbItems = [
     { label: 'Sản phẩm', link: '/product' },

@@ -46,10 +46,10 @@ const Register = () => {
         gender: formData.gender
       });
       
-      setSuccess('Đăng ký thành công! Đang chuyển hướng...');
+      setSuccess('Đăng ký thành công! Vui lòng kiểm tra email để lấy mã OTP...');
       setTimeout(() => {
-        navigate('/login');
-      }, 2000);
+        navigate('/verify-account', { state: { email: formData.email } });
+      }, 1500);
       
     } catch (err) {
       if (err.response && err.response.data && err.response.data.message) {

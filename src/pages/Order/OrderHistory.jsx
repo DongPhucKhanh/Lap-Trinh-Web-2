@@ -34,9 +34,10 @@ const OrderHistory = () => {
   const filteredOrders = orders.filter(o => {
     // Status filter
     let statusMatch = true;
-    if (filter === 'pending') statusMatch = o.status === 0;
-    if (filter === 'completed') statusMatch = o.status === 1 || o.status === 2; // assuming 1=Shipping, 2=Completed
-    if (filter === 'cancelled') statusMatch = o.status === 3;
+    if (filter === 'pending') statusMatch = [0, 1, 2].includes(o.status);
+    if (filter === 'delivering') statusMatch = o.status === 3;
+    if (filter === 'completed') statusMatch = [4, 5].includes(o.status);
+    if (filter === 'cancelled') statusMatch = [6, 7].includes(o.status);
     
     // Search filter
     let searchMatch = true;
@@ -54,10 +55,14 @@ const OrderHistory = () => {
 
   const getStatusBadge = (status) => {
     switch(status) {
-      case 0: return <span className="status-badge warning">Chờ xác nhận</span>;
-      case 1: return <span className="status-badge warning" style={{background: '#e0f2fe', color: '#0284c7'}}>Đang giao hàng</span>;
-      case 2: return <span className="status-badge success">Hoàn thành</span>;
-      case 3: return <span className="status-badge danger">Đã hủy</span>;
+      case 0: return <span className="status-badge" style={{background: '#fef3c7', color: '#d97706'}}>Chờ xác nhận</span>;
+      case 1: return <span className="status-badge" style={{background: '#e0f2fe', color: '#0284c7'}}>Đã xác nhận</span>;
+      case 2: return <span className="status-badge" style={{background: '#f3e8ff', color: '#7e22ce'}}>Đang chuẩn bị</span>;
+      case 3: return <span className="status-badge" style={{background: '#ffedd5', color: '#c2410c'}}>Đang giao</span>;
+      case 4: return <span className="status-badge" style={{background: '#dcfce7', color: '#15803d'}}>Đã giao</span>;
+      case 5: return <span className="status-badge success">Hoàn thành</span>;
+      case 6: return <span className="status-badge danger">Đã hủy</span>;
+      case 7: return <span className="status-badge" style={{background: '#fecaca', color: '#991b1b'}}>Hoàn tiền</span>;
       default: return <span className="status-badge">Không xác định</span>;
     }
   };
@@ -82,9 +87,10 @@ const OrderHistory = () => {
     <div className="order-history-page">
       <div className="order-tabs">
         <button className={filter === 'all' ? 'active' : ''} onClick={() => setFilter('all')}>Tất cả</button>
-        <button className={filter === 'pending' ? 'active' : ''} onClick={() => setFilter('pending')}>Chờ xác nhận</button>
-        <button className={filter === 'completed' ? 'active' : ''} onClick={() => setFilter('completed')}>Đã giao / Hoàn thành</button>
-        <button className={filter === 'cancelled' ? 'active' : ''} onClick={() => setFilter('cancelled')}>Đã hủy</button>
+        <button className={filter === 'pending' ? 'active' : ''} onClick={() => setFilter('pending')}>Chờ xử lý</button>
+        <button className={filter === 'delivering' ? 'active' : ''} onClick={() => setFilter('delivering')}>Đang giao</button>
+        <button className={filter === 'completed' ? 'active' : ''} onClick={() => setFilter('completed')}>Hoàn thành</button>
+        <button className={filter === 'cancelled' ? 'active' : ''} onClick={() => setFilter('cancelled')}>Đã hủy / Hoàn tiền</button>
       </div>
 
       <div className="order-search">

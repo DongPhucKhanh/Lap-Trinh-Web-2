@@ -9,6 +9,7 @@ import BestSellerSection from './sections/BestSellerSection';
 import FlashSaleSection from './sections/FlashSaleSection';
 import TestimonialSection from './sections/TestimonialSection';
 import BlogNewsletterSection from './sections/BlogNewsletterSection';
+import ContactCTASection from './sections/ContactCTASection';
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -72,6 +73,7 @@ const Home = () => {
       <ParallaxBannerSection />
       <BestSellerSection products={bestSellers} />
       <TestimonialSection />
+      <ContactCTASection />
       <BlogNewsletterSection posts={latestPosts} />
     </div>
   );

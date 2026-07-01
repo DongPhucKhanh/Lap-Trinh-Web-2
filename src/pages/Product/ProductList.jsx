@@ -1,18 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Filter, Search, Grid, List as ListIcon } from 'lucide-react';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import Pagination from '../../components/Pagination/Pagination';
+import QuickViewModal from '../../components/ProductCard/QuickViewModal';
 import api from '../../services/api';
+import { AuthContext } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 import './ProductList.css';
 
 const ProductList = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
   const initialSearch = searchParams.get('search') || '';
   const initialCategory = searchParams.get('category') || '';
+  const initialPage = parseInt(searchParams.get('page')) || 1;
   const initialSale = searchParams.get('sale') === 'true';
+
+  const { user } = useContext(AuthContext);
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -21,34 +28,71 @@ const ProductList = () => {
   const [filter, setFilter] = useState({ 
     categoryId: initialCategory, 
     search: initialSearch, 
-    sort: 'newest',
+    sort: 'id', // Default sort by id in backend
+    direction: 'desc',
     saleOnly: initialSale
   });
   
   const [viewMode, setViewMode] = useState('grid');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
   const itemsPerPage = 12;
 
-  useEffect(() => {
-    // Sync filter if URL changes
-    setFilter(prev => ({
-      ...prev,
-      search: searchParams.get('search') || '',
-      categoryId: searchParams.get('category') || '',
-      saleOnly: searchParams.get('sale') === 'true'
-    }));
-  }, [location.search]);
+  // Favorites
+  const [favorites, setFavorites] = useState(new Set());
+
+  // Quick View
+  const [quickViewProduct, setQuickViewProduct] = useState(null);
 
   useEffect(() => {
-    api.get('/categories').then(res => setCategories(res.data)).catch(err => console.error(err));
+    // Sync URL when filter or page changes
+    const params = new URLSearchParams();
+    if (filter.search) params.set('search', filter.search);
+    if (filter.categoryId) params.set('category', filter.categoryId);
+    if (filter.saleOnly) params.set('sale', 'true');
+    if (currentPage > 1) params.set('page', currentPage);
+    navigate({ search: params.toString() }, { replace: true });
+  }, [filter, currentPage, navigate]);
+
+  useEffect(() => {
+    api.get('/categories').then(res => setCategories(res.data)).catch(console.error);
+    if (user) {
+      api.get('/favorites').then(res => {
+        setFavorites(new Set(res.data.map(p => p.id)));
+      }).catch(console.error);
+    }
+  }, [user]);
+
+  useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [filter, currentPage]);
 
   const fetchProducts = () => {
     setLoading(true);
-    api.get('/products')
+    const params = {
+      page: currentPage - 1, // Spring Data JPA is 0-indexed
+      size: itemsPerPage,
+      sort: filter.sort,
+      direction: filter.direction
+    };
+    if (filter.search) params.keyword = filter.search;
+    if (filter.categoryId) params.category = filter.categoryId;
+
+    api.get('/products/search', { params })
       .then(res => {
-        setProducts(res.data);
+        let content = res.data.content || res.data;
+        // Client-side filter for saleOnly since API might not support it directly
+        if (filter.saleOnly) {
+          content = content.filter(p => p.productSale && p.productSale.pricesale);
+          setProducts(content);
+          setTotalElements(content.length);
+          setTotalPages(Math.ceil(content.length / itemsPerPage));
+        } else {
+          setProducts(content);
+          setTotalPages(res.data.totalPages || 1);
+          setTotalElements(res.data.totalElements || content.length);
+        }
         setLoading(false);
       })
       .catch(err => {
@@ -63,40 +107,35 @@ const ProductList = () => {
     setCurrentPage(1);
   };
 
-  // Filter and Sort Logic
-  let displayedProducts = [...products];
-  
-  if (filter.search) {
-    displayedProducts = displayedProducts.filter(p => p.name.toLowerCase().includes(filter.search.toLowerCase()));
-  }
-  
-  if (filter.categoryId) {
-    displayedProducts = displayedProducts.filter(p => p.category && p.category.id.toString() === filter.categoryId);
-  }
+  const handleSortChange = (e) => {
+    const val = e.target.value;
+    if (val === 'newest') setFilter(prev => ({...prev, sort: 'id', direction: 'desc'}));
+    if (val === 'priceAsc') setFilter(prev => ({...prev, sort: 'price', direction: 'asc'}));
+    if (val === 'priceDesc') setFilter(prev => ({...prev, sort: 'price', direction: 'desc'}));
+    setCurrentPage(1);
+  };
 
-  if (filter.saleOnly) {
-    displayedProducts = displayedProducts.filter(p => p.productSale && p.productSale.pricesale);
-  }
-  
-  if (filter.sort === 'priceAsc') {
-    displayedProducts.sort((a, b) => {
-      const priceA = (a.productSale && a.productSale.pricesale) ? a.productSale.pricesale : a.price;
-      const priceB = (b.productSale && b.productSale.pricesale) ? b.productSale.pricesale : b.price;
-      return priceA - priceB;
-    });
-  } else if (filter.sort === 'priceDesc') {
-    displayedProducts.sort((a, b) => {
-      const priceA = (a.productSale && a.productSale.pricesale) ? a.productSale.pricesale : a.price;
-      const priceB = (b.productSale && b.productSale.pricesale) ? b.productSale.pricesale : b.price;
-      return priceB - priceA;
-    });
-  } else {
-    displayedProducts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  }
-
-  // Pagination
-  const totalPages = Math.ceil(displayedProducts.length / itemsPerPage);
-  const paginatedProducts = displayedProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const toggleFavorite = async (product) => {
+    if (!user) {
+      toast.info('Vui lòng đăng nhập để thêm vào danh sách yêu thích!');
+      navigate('/login');
+      return;
+    }
+    const isFav = favorites.has(product.id);
+    try {
+      if (isFav) {
+        await api.delete(`/favorites/${product.id}`);
+        setFavorites(prev => { const next = new Set(prev); next.delete(product.id); return next; });
+        toast.success('Đã xóa khỏi yêu thích!');
+      } else {
+        await api.post(`/favorites/${product.id}`);
+        setFavorites(prev => { const next = new Set(prev); next.add(product.id); return next; });
+        toast.success('Đã thêm vào yêu thích!');
+      }
+    } catch (err) {
+      toast.error('Lỗi khi thao tác yêu thích.');
+    }
+  };
 
   const breadcrumbItems = [
     { label: 'Sản phẩm', link: null }
@@ -166,7 +205,7 @@ const ProductList = () => {
           <Breadcrumb items={breadcrumbItems} />
           
           <div className="products-header">
-            <span>Hiển thị <strong>{displayedProducts.length}</strong> kết quả</span>
+            <span>Hiển thị <strong>{totalElements}</strong> kết quả</span>
             
             <div className="products-controls">
               <div className="view-modes">
@@ -184,7 +223,7 @@ const ProductList = () => {
                 </button>
               </div>
 
-              <select name="sort" value={filter.sort} onChange={handleFilterChange} className="sort-select-inline">
+              <select name="sort" onChange={handleSortChange} className="sort-select-inline" defaultValue="newest">
                 <option value="newest">Mới nhất</option>
                 <option value="priceAsc">Giá: Thấp đến Cao</option>
                 <option value="priceDesc">Giá: Cao xuống Thấp</option>
@@ -194,24 +233,42 @@ const ProductList = () => {
 
           {loading ? (
             <div className="loader"></div>
-          ) : paginatedProducts.length > 0 ? (
+          ) : products.length > 0 ? (
             <>
               <div className={`product-${viewMode}`}>
-                {paginatedProducts.map(product => (
-                  <ProductCard key={product.id} product={product} layout={viewMode} />
+                {products.map(product => (
+                  <ProductCard 
+                    key={product.id} 
+                    product={product} 
+                    layout={viewMode}
+                    isFavorite={favorites.has(product.id)}
+                    onToggleFavorite={toggleFavorite}
+                    onQuickView={setQuickViewProduct}
+                  />
                 ))}
               </div>
-              <Pagination 
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
+              
+              {totalPages > 1 && (
+                <Pagination 
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              )}
             </>
           ) : (
             <div className="empty-msg">Không tìm thấy món ăn nào phù hợp với bộ lọc.</div>
           )}
         </div>
       </div>
+      
+      {/* Quick View Modal */}
+      {quickViewProduct && (
+        <QuickViewModal 
+          product={quickViewProduct} 
+          onClose={() => setQuickViewProduct(null)} 
+        />
+      )}
     </div>
   );
 };

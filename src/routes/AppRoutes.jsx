@@ -17,6 +17,7 @@ import OrderDetail from '../pages/Order/OrderDetail';
 import Login from '../pages/Auth/Login';
 import Register from '../pages/Auth/Register';
 import ForgotPassword from '../pages/Auth/ForgotPassword';
+import VerifyAccount from '../pages/Auth/VerifyAccount';
 import Profile from '../pages/Profile/Profile';
 import Settings from '../pages/Profile/Settings';
 import Wishlist from '../pages/Profile/Wishlist';
@@ -44,6 +45,7 @@ const AppRoutes = () => {
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="verify-account" element={<VerifyAccount />} />
         <Route path="policy/:type" element={<PolicyPage />} />
       </Route>
 

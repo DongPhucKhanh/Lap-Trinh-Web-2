@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Star } from 'lucide-react';
+import { ShoppingCart, Star, Heart, Eye } from 'lucide-react';
 import { CartContext } from '../../context/CartContext';
 import './ProductCard.css';
 
-const ProductCard = ({ product, layout = 'grid' }) => {
+const ProductCard = ({ product, layout = 'grid', isFavorite, onToggleFavorite, onQuickView }) => {
   const { addToCart } = useContext(CartContext);
 
   // Check if product has an active sale
@@ -43,6 +43,26 @@ const ProductCard = ({ product, layout = 'grid' }) => {
             onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1599490659213-e2b9527bd08c?auto=format&fit=crop&w=500&q=80' }}
           />
         </Link>
+        
+        {/* Overlay Actions */}
+        <div className="product-overlay-actions">
+          <button 
+            className="action-btn"
+            onClick={(e) => { e.preventDefault(); onToggleFavorite && onToggleFavorite(product); }}
+            title={isFavorite ? "Bỏ yêu thích" : "Yêu thích"}
+          >
+            <Heart size={18} fill={isFavorite ? "#ef4444" : "none"} color={isFavorite ? "#ef4444" : "currentColor"} />
+          </button>
+          
+          <button 
+            className="action-btn"
+            onClick={(e) => { e.preventDefault(); onQuickView && onQuickView(product); }}
+            title="Xem nhanh"
+          >
+            <Eye size={18} />
+          </button>
+        </div>
+
         {layout === 'grid' && (
           <button 
             className="add-to-cart-btn" 

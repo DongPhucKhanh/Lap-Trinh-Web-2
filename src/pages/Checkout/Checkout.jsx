@@ -207,7 +207,7 @@ const Checkout = () => {
                   <p>SL: {item.quantity}</p>
                 </div>
                 <div className="item-price">
-                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price * item.quantity)}
+                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format((item.productSale?.pricesale || item.price) * item.quantity)}
                 </div>
               </div>
             ))}

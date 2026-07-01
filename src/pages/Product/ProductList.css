@@ -37,8 +37,6 @@
   padding: 1.5rem;
   height: fit-content;
   box-shadow: var(--shadow-sm);
-  position: sticky;
-  top: 100px;
 }
 
 .filter-block {

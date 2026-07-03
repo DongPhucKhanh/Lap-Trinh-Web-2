@@ -3,44 +3,54 @@
 @import "tailwindcss/utilities";
 
 @theme {
-  --color-primary: #ff6b6b;
-  --color-primary-hover: #ff5252;
-  --color-secondary: #4ecdc4;
-  --color-dark: #1a1a2e;
-  --color-dark-light: #16213e;
-  --color-light: #f4f7f6;
+  --color-primary: #0f172a;
+  --color-primary-hover: #1e293b;
+  --color-secondary: #3b82f6;
+  --color-dark: #020617;
+  --color-dark-light: #0f172a;
+  --color-light: #f8fafc;
   --font-sans: "Outfit", sans-serif;
 }
 
 :root {
   /* Colors */
-  --primary: #ff6b6b;
-  --primary-hover: #ff5252;
-  --primary-glow: rgba(255, 107, 107, 0.4);
-  --secondary: #4ecdc4;
-  --dark: #1a1a2e;
-  --dark-light: #16213e;
-  --light: #f4f7f6;
+  --primary: #0f172a;
+  --primary-hover: #1e293b;
+  --primary-glow: rgba(15, 23, 42, 0.4);
+  --secondary: #3b82f6;
+  --dark: #020617;
+  --dark-light: #0f172a;
+  --light: #f8fafc;
   --text-main: #2d3436;
   --text-muted: #636e72;
   --white: #ffffff;
   
-  /* UI Elements */
-  --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);
-  --shadow-hover: 0 20px 40px rgba(255, 107, 107, 0.15);
-  --shadow-3d: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0,0,0,0.05);
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.4);
+  /* Fonts & Shadows */
+  --font-sans: "Outfit", sans-serif;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+  --shadow-3d: 0 10px 30px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.03);
   
-  /* Transitions */
-  --transition-fast: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  --transition-slow: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  /* Utilities */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 999px;
+  --transition-fast: all 0.2s ease;
   --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme='dark'] {
+  --primary: #3b82f6;
+  --primary-hover: #60a5fa;
+  --primary-glow: rgba(59, 130, 246, 0.4);
+  --light: #020617;
+  --white: #0f172a;
+  --text-main: #f8fafc;
+  --text-muted: #cbd5e1;
+  --glass-bg: rgba(15, 23, 42, 0.8);
 }
 
 * {

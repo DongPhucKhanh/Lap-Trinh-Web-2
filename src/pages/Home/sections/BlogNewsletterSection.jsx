@@ -16,8 +16,8 @@ const BlogNewsletterSection = ({ posts }) => {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl md:text-5xl font-extrabold text-dark mb-4">Tạp Chí Ẩm Thực</h2>
-            <p className="text-gray-500 text-lg">Khám phá những câu chuyện thú vị và bí quyết ăn vặt ngon miệng.</p>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-dark mb-4">Tạp Chí Thời Trang</h2>
+            <p className="text-gray-500 text-lg">Khám phá những câu chuyện thú vị và bí quyết giày thể thao đẹp mắt.</p>
           </motion.div>
           
           <motion.div
@@ -49,7 +49,7 @@ const BlogNewsletterSection = ({ posts }) => {
                 >
                   <Link to={`/post/${post.slug || post.id}`} className="block relative aspect-[4/3] rounded-[24px] overflow-hidden mb-6 bg-gray-200">
                     <img 
-                      src={imageUrl || 'https://images.unsplash.com/photo-1599490659213-e2b9527bd08c?auto=format&fit=crop&w=600&q=80'} 
+                      src={imageUrl || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80'} 
                       alt={post.title}
                       className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out"
                     />
@@ -85,7 +85,7 @@ const BlogNewsletterSection = ({ posts }) => {
           
           <div className="relative z-10 md:w-1/2">
             <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4">Đăng ký nhận <br/><span className="text-primary">ưu đãi độc quyền</span></h2>
-            <p className="text-gray-400 text-lg">Đừng bỏ lỡ các voucher giảm giá và thông tin sản phẩm mới nhất từ SnackHub.</p>
+            <p className="text-gray-400 text-lg">Đừng bỏ lỡ các voucher giảm giá và thông tin sản phẩm mới nhất từ SneakerHub.</p>
           </div>
           
           <div className="relative z-10 w-full md:w-1/2">

@@ -52,12 +52,12 @@ const Login = () => {
               <div className="auth-brand-logo">
                 <span style={{color: 'white', fontWeight: 900, fontSize: '20px'}}>S</span>
               </div>
-              SnackHub
+              SneakerHub
             </div>
 
             <div className="auth-hero-text">
               <h1>Khám Phá Niềm Vui<br/>Trong Từng Hương Vị</h1>
-              <p>Tham gia cùng hàng ngàn tín đồ ăn vặt thưởng thức những món ngon thượng hạng giao hàng toàn quốc. Hương vị yêu thích chỉ cách bạn một cú click.</p>
+              <p>Tham gia cùng hàng ngàn tín giày thể thao thưởng thức những mẫu giày thượng hạng giao hàng toàn quốc. Hương vị yêu thích chỉ cách bạn một cú click.</p>
               
               <div className="auth-hero-badges">
                 <div className="hero-badge"><Truck size={18} color="#fcd34d" /> Giao Hàng Toàn Quốc</div>

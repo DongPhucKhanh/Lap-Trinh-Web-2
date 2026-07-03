@@ -11,7 +11,7 @@
   height: 38px;
   border-radius: 50%;
   border: 1px solid #e2e8f0;
-  background: white;
+  background: var(--white);
   color: var(--text-main);
   font-weight: 600;
   display: flex;
@@ -36,9 +36,9 @@
 .page-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background: #f8fafc;
+  background: var(--light);
 }
 
 .nav-btn {
-  background: #f1f5f9;
+  background: var(--light);
 }

@@ -152,7 +152,7 @@ const PaymentGateway = () => {
       </div>
 
       <div className="pg-footer">
-        <p>Phát triển bởi SnackHub © 2026</p>
+        <p>Phát triển bởi SneakerHub © 2026</p>
         <div className="pg-security">
           <img src="https://cdn.iconscout.com/icon/free/png-256/pci-dss-3629088-3031023.png" alt="PCI DSS" style={{filter: 'grayscale(1)', opacity: 0.7}} />
           <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#64748b', fontWeight: 'bold' }}>

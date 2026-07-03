@@ -9,7 +9,7 @@
 
 .post-header h1 {
   font-size: 2.5rem;
-  color: var(--dark);
+  color: var(--text-main);
   margin-bottom: 1rem;
 }
 
@@ -25,7 +25,7 @@
 }
 
 .post-card {
-  background: white;
+  background: var(--white);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
@@ -102,7 +102,7 @@
 
 .post-title {
   font-size: 1.25rem;
-  color: var(--dark);
+  color: var(--text-main);
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -151,7 +151,7 @@
 }
 
 .post-detail-wrapper {
-  background: white;
+  background: var(--white);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
@@ -176,7 +176,7 @@
 
 .post-detail-header h1 {
   font-size: 2.5rem;
-  color: var(--dark);
+  color: var(--text-main);
   line-height: 1.3;
   margin-bottom: 1.5rem;
 }
@@ -212,7 +212,7 @@
   line-height: 1.8;
   font-style: italic;
   padding: 1.5rem;
-  background: #f8fafc;
+  background: var(--light);
   border-left: 4px solid var(--primary);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   margin-bottom: 2.5rem;
@@ -221,7 +221,7 @@
 .html-content {
   font-size: 1.05rem;
   line-height: 1.8;
-  color: var(--dark);
+  color: var(--text-main);
   width: 100%;
   overflow-x: hidden;
 }
@@ -230,6 +230,8 @@
   max-width: 100% !important;
   word-wrap: break-word !important;
   overflow-wrap: break-word !important;
+  background-color: transparent !important;
+  color: var(--text-main) !important;
 }
 
 .html-content p {
@@ -245,21 +247,21 @@
 }
 
 .html-content h2, .html-content h3 {
-  color: var(--dark);
+  color: var(--text-main);
   margin: 2rem 0 1rem;
 }
 
 .post-detail-footer {
   padding: 2rem 3rem;
   border-top: 1px solid #f1f5f9;
-  background: #f8fafc;
+  background: var(--light);
 }
 
 .share-section {
   display: flex;
   align-items: center;
   gap: 1rem;
-  color: var(--dark);
+  color: var(--text-main);
   font-weight: 600;
 }
 

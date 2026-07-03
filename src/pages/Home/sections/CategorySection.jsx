@@ -49,7 +49,7 @@ const CategorySection = ({ categories }) => {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-4xl md:text-5xl font-extrabold text-dark mb-4">Khám Phá Danh Mục</h2>
-          <p className="text-gray-500 text-lg max-w-2xl mx-auto">Lựa chọn hàng ngàn sản phẩm ăn vặt hấp dẫn được phân loại rõ ràng giúp bạn dễ dàng tìm kiếm.</p>
+          <p className="text-gray-500 text-lg max-w-2xl mx-auto">Lựa chọn hàng ngàn sản phẩm giày thể thao hấp dẫn được phân loại rõ ràng giúp bạn dễ dàng tìm kiếm.</p>
         </motion.div>
 
         <div 

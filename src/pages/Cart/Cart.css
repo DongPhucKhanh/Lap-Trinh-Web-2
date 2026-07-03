@@ -3,14 +3,14 @@
   margin: 4rem auto;
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: var(--white);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
 }
 
 .cart-empty-container h2 {
   font-size: 1.8rem;
-  color: var(--dark);
+  color: var(--text-main);
   margin-top: 1.5rem;
   margin-bottom: 0.5rem;
 }
@@ -34,7 +34,7 @@
 
 .cart-header h1 {
   font-size: 2rem;
-  color: var(--dark);
+  color: var(--text-main);
 }
 
 .btn-outline-danger {
@@ -72,7 +72,7 @@
 
 .cart-item {
   display: flex;
-  background: white;
+  background: var(--white);
   padding: 1.5rem;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
@@ -100,7 +100,7 @@
 
 .cart-item-details h3 {
   font-size: 1.1rem;
-  color: var(--dark);
+  color: var(--text-main);
   margin-bottom: 0.5rem;
 }
 
@@ -132,9 +132,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
+  background: var(--white);
   border-radius: 4px;
-  color: var(--dark);
+  color: var(--text-main);
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   transition: var(--transition);
 }
@@ -167,7 +167,7 @@
 }
 
 .cart-summary {
-  background: white;
+  background: var(--white);
   padding: 2rem;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
@@ -179,7 +179,7 @@
 .cart-summary h2 {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
-  color: var(--dark);
+  color: var(--text-main);
 }
 
 .summary-row {
@@ -198,7 +198,7 @@
 .summary-row.total {
   font-size: 1.25rem;
   font-weight: 800;
-  color: var(--dark);
+  color: var(--text-main);
   margin-bottom: 2rem;
 }
 

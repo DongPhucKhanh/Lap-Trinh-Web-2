@@ -150,7 +150,7 @@ const ProductDetail = () => {
             <h1 className="detail-title">{product.name || product.title}</h1>
             
             <div className="detail-meta">
-              <span className="detail-category">{product.category?.name || 'SnackHub'}</span>
+              <span className="detail-category">{product.category?.name || 'SneakerHub'}</span>
               <span className="detail-status in-stock">Còn hàng</span>
             </div>
 

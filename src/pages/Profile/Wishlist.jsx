@@ -43,7 +43,7 @@ const Wishlist = () => {
     <div className="wishlist-container">
       <div className="wishlist-header">
         <h2><Heart size={24} className="text-red" /> Sản Phẩm Yêu Thích</h2>
-        <p>Danh sách các món ăn vặt bạn đã thả tim</p>
+        <p>Danh sách các món giày thể thao bạn đã thả tim</p>
       </div>
 
       {favorites.length === 0 ? (

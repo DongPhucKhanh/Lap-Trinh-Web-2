@@ -18,7 +18,7 @@ const BestSellerSection = ({ products }) => {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-4xl md:text-5xl font-extrabold text-dark mb-4">Sản Phẩm Bán Chạy</h2>
-            <p className="text-gray-500 text-lg">Những hương vị được yêu thích nhất bởi hàng ngàn khách hàng.</p>
+            <p className="text-gray-500 text-lg">Những phong cách được yêu thích nhất bởi hàng ngàn khách hàng.</p>
           </motion.div>
           
           <motion.div

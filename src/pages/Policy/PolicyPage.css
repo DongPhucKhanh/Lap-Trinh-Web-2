@@ -54,7 +54,7 @@
 }
 
 .policy-content {
-  background: white;
+  background: var(--white);
   padding: 2rem 2.5rem;
   border-radius: 16px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.06);

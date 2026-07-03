@@ -10,28 +10,28 @@ const testimonials = [
   { 
     name: 'Trần Thị Mai', 
     role: 'Khách hàng thân thiết', 
-    text: 'Mình đã đặt nhiều lần và lần nào cũng rất hài lòng. Đồ ăn vặt đóng gói cẩn thận, hương vị đúng như mô tả. Giao hàng cực nhanh!', 
+    text: 'Mình đã đặt nhiều lần và lần nào cũng rất hài lòng. Đồ giày thể thao đóng gói cẩn thận, phong cách đúng như mô tả. Giao hàng cực nhanh!', 
     stars: 5, 
     color: '#e74c3c' 
   },
   { 
     name: 'Lê Văn Hùng', 
     role: 'Khách hàng mới', 
-    text: 'Lần đầu mua ở đây nhưng rất bất ngờ! Giá cả hợp lý, chất lượng tốt. Đặc biệt là bánh tráng cuốn và khô gà ăn là nghiền luôn!', 
+    text: 'Lần đầu mua ở đây nhưng rất bất ngờ! Giá cả hợp lý, chất lượng tốt. Đặc biệt là giày chạy và giày thời trang mang là mê luôn!', 
     stars: 5, 
     color: '#3498db' 
   },
   { 
     name: 'Phạm Ngọc Linh', 
     role: 'Đối tác bán hàng', 
-    text: 'Mình là đối tác bán lại của SnackHub. Nguồn hàng ổn định, chính sách hỗ trợ tốt. Rất yên tâm khi hợp tác lâu dài.', 
+    text: 'Mình là đối tác bán lại của SneakerHub. Nguồn hàng ổn định, chính sách hỗ trợ tốt. Rất yên tâm khi hợp tác lâu dài.', 
     stars: 4, 
     color: '#2ecc71' 
   },
   { 
     name: 'Hoàng Minh', 
     role: 'Khách hàng', 
-    text: 'Combo ăn vặt rất tuyệt vời cho các buổi nhậu cuối tuần cùng bạn bè. Đóng gói đẹp, vị đậm đà.', 
+    text: 'Combo giày thể thao rất tuyệt vời cho các buổi nhậu cuối tuần cùng bạn bè. Đóng gói đẹp, vị bền bỉ.', 
     stars: 5, 
     color: '#9b59b6' 
   }

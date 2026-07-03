@@ -16,7 +16,7 @@ const BrandStorySection = () => {
         >
           <div className="relative aspect-[4/5] rounded-3xl overflow-hidden bg-gray-100">
             <img 
-              src="https://images.unsplash.com/photo-1550136513-548af4445338?q=80&w=1000&auto=format&fit=crop" 
+              src="https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=1000&auto=format&fit=crop" 
               alt="Brand Story" 
               className="w-full h-full object-cover"
             />
@@ -34,7 +34,7 @@ const BrandStorySection = () => {
           >
             <span className="text-sm font-bold tracking-widest text-primary uppercase mb-4 block">Câu Chuyện Của Chúng Tôi</span>
             <h2 className="text-4xl md:text-5xl font-extrabold text-dark mb-6 leading-tight">
-              Đam mê từ những <br/>hương vị nguyên bản
+              Đam mê từ những <br/>phong cách nguyên bản
             </h2>
           </motion.div>
 
@@ -45,7 +45,7 @@ const BrandStorySection = () => {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            Bắt đầu từ một căn bếp nhỏ với tình yêu mãnh liệt dành cho đồ ăn vặt, SnackHub ra đời với sứ mệnh mang đến những món ăn không chỉ ngon miệng mà còn đảm bảo chất lượng tuyệt đối.
+            Bắt đầu từ một căn bếp nhỏ với tình yêu mãnh liệt dành cho giày thể thao, SneakerHub ra đời với sứ mệnh mang đến những đôi giày không chỉ đẹp mắt mà còn đảm bảo chất lượng tuyệt đối.
           </motion.p>
           
           <motion.p 
@@ -55,7 +55,7 @@ const BrandStorySection = () => {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            Chúng tôi tin rằng, mỗi món ăn vặt đều mang trong mình một niềm vui bé nhỏ, giúp bạn xua tan căng thẳng và kết nối với những người thân yêu.
+            Chúng tôi tin rằng, mỗi món giày thể thao đều mang trong mình một niềm vui bé nhỏ, giúp bạn xua tan căng thẳng và kết nối với những người thân yêu.
           </motion.p>
 
           <motion.div

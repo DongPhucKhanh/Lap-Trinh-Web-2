@@ -19,7 +19,7 @@
 }
 
 .checkout-form-section, .checkout-summary-section {
-  background: white;
+  background: var(--white);
   padding: 2.5rem;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
@@ -27,7 +27,7 @@
 
 .checkout-form-section h2, .checkout-summary-section h2 {
   font-size: 1.5rem;
-  color: var(--dark);
+  color: var(--text-main);
   margin-bottom: 2rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid #f1f5f9;
@@ -52,7 +52,7 @@
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  color: var(--dark);
+  color: var(--text-main);
   font-weight: 500;
 }
 
@@ -73,7 +73,7 @@
 
 .payment-title {
   font-size: 1.25rem;
-  color: var(--dark);
+  color: var(--text-main);
   margin: 2rem 0 1rem;
 }
 
@@ -94,7 +94,7 @@
 }
 
 .payment-option:hover {
-  background: #f8fafc;
+  background: var(--light);
 }
 
 .payment-option input[type="radio"] {
@@ -108,7 +108,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  color: var(--dark);
+  color: var(--text-main);
   font-weight: 500;
 }
 
@@ -148,7 +148,7 @@
 
 .item-info h4 {
   font-size: 1rem;
-  color: var(--dark);
+  color: var(--text-main);
   margin-bottom: 0.25rem;
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -184,7 +184,7 @@
   margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid #e2e8f0;
-  color: var(--dark);
+  color: var(--text-main);
   font-size: 1.25rem;
   font-weight: 700;
 }
@@ -221,7 +221,7 @@
 .checkout-success {
   max-width: 600px;
   margin: 5rem auto;
-  background: white;
+  background: var(--white);
   padding: 4rem 2rem;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
@@ -230,7 +230,7 @@
 
 .checkout-success h2 {
   font-size: 2rem;
-  color: var(--dark);
+  color: var(--text-main);
   margin: 1.5rem 0 1rem;
 }
 

@@ -37,10 +37,10 @@ const ProductCard = ({ product, layout = 'grid', isFavorite, onToggleFavorite, o
         {!hasSale && isNew() && <span className="new-badge">NEW</span>}
         <Link to={`/product/${product.id}`}>
           <img 
-            src={product.image ? (product.image.startsWith('http') ? product.image : `http://localhost:8080/uploads/${product.image}`) : 'https://images.unsplash.com/photo-1599490659213-e2b9527bd08c?auto=format&fit=crop&w=500&q=80'} 
+            src={product.image ? (product.image.startsWith('http') ? product.image : `http://localhost:8080/uploads/${product.image}`) : 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80'} 
             alt={product.name} 
             className="product-image"
-            onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1599490659213-e2b9527bd08c?auto=format&fit=crop&w=500&q=80' }}
+            onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80' }}
           />
         </Link>
         
@@ -75,7 +75,7 @@ const ProductCard = ({ product, layout = 'grid', isFavorite, onToggleFavorite, o
       </div>
 
       <div className="product-info">
-        <div className="product-category">{product.category?.name || 'Ăn vặt'}</div>
+        <div className="product-category">{product.category?.name || 'Giày thể thao'}</div>
         <Link to={`/product/${product.id}`} className="product-name">
           <h3>{product.name}</h3>
         </Link>
@@ -87,7 +87,7 @@ const ProductCard = ({ product, layout = 'grid', isFavorite, onToggleFavorite, o
         
         {layout === 'list' && (
           <p className="product-description-snippet">
-            {product.description || 'Thức ăn vặt thơm ngon, đậm đà hương vị truyền thống. Sản phẩm được đóng gói kỹ lưỡng đảm bảo vệ sinh an toàn thực phẩm.'}
+            {product.description || 'Mẫu giày thể thao êm ái, bền bỉ phong cách truyền thống. Sản phẩm được đóng gói kỹ lưỡng đảm bảo chất lượng và độ bền.'}
           </p>
         )}
 

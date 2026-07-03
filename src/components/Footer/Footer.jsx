@@ -9,10 +9,10 @@ const Footer = () => {
       <div className="footer-top">
         {/* Column 1: About */}
         <div className="footer-column">
-          <h3>Về SnackHub</h3>
+          <h3>Về SneakerHub</h3>
           <p>
-            SnackHub - Thiên đường ăn vặt dành cho bạn. Chúng tôi cam kết mang đến những 
-            sản phẩm chất lượng nhất, ngon nhất và đảm bảo vệ sinh an toàn thực phẩm.
+            SneakerHub - Thiên đường giày thể thao dành cho bạn. Chúng tôi cam kết mang đến những 
+            sản phẩm chất lượng nhất, ngon nhất và đảm bảo chất lượng và độ bền.
           </p>
           <div className="footer-socials">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="social-icon">FB</a>
@@ -39,7 +39,7 @@ const Footer = () => {
           <ul className="footer-contact">
             <li>
               <MapPin size={18} />
-              <span>123 Đường Ăn Vặt, Quận Ngon Miệng, TP. Hồ Chí Minh</span>
+              <span>123 Đường Giày Thể Thao, Quận 1, TP. Hồ Chí Minh</span>
             </li>
             <li>
               <Phone size={18} />
@@ -47,7 +47,7 @@ const Footer = () => {
             </li>
             <li>
               <Mail size={18} />
-              <span>contact@snackhub.vn</span>
+              <span>contact@sneakerhub.vn</span>
             </li>
           </ul>
         </div>
@@ -67,7 +67,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} SnackHub. Mọi món ngon đều ở đây!</p>
+        <p>&copy; {new Date().getFullYear()} SneakerHub. Mọi mẫu giày đều ở đây!</p>
       </div>
     </footer>
   );

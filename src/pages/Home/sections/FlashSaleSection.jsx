@@ -28,7 +28,7 @@ const FlashSaleSection = ({ products, flashSaleEndTime }) => {
               <Zap className="text-yellow-400" size={32} fill="currentColor" />
               <h2 className="text-4xl md:text-5xl font-extrabold text-white">Khuyến Mãi Giờ Vàng</h2>
             </div>
-            <p className="text-gray-400 text-lg">Chớp ngay cơ hội thưởng thức đồ ăn vặt với giá cực hời.</p>
+            <p className="text-gray-400 text-lg">Chớp ngay cơ hội thưởng thức giày thể thao với giá cực hời.</p>
           </motion.div>
           
           <motion.div

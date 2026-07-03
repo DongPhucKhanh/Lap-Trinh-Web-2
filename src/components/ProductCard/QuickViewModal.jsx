@@ -38,7 +38,7 @@ const QuickViewModal = ({ product, onClose }) => {
           
           <div className="quickview-info">
             <h2 className="quickview-title">{product.name}</h2>
-            <div className="quickview-category">{product.category?.name || 'Ăn vặt'}</div>
+            <div className="quickview-category">{product.category?.name || 'Giày thể thao'}</div>
             
             <div className="quickview-price-sec">
               {hasSale ? (
@@ -52,7 +52,7 @@ const QuickViewModal = ({ product, onClose }) => {
             </div>
             
             <p className="quickview-desc">
-              {product.description || 'Sản phẩm thơm ngon, chất lượng tuyệt hảo.'}
+              {product.description || 'Sản phẩm êm ái, chất lượng tuyệt hảo.'}
             </p>
             
             <div className="quickview-stock">

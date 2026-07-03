@@ -50,7 +50,7 @@ const Contact = () => {
       <div className="container">
         <div className="contact-header">
           <h1>Liên hệ với chúng tôi</h1>
-          <p>Bạn có câu hỏi hoặc cần hỗ trợ? Đừng ngần ngại liên hệ với SnackHub nhé!</p>
+          <p>Bạn có câu hỏi hoặc cần hỗ trợ? Đừng ngần ngại liên hệ với SneakerHub nhé!</p>
         </div>
 
         <div className="contact-grid">
@@ -60,7 +60,7 @@ const Contact = () => {
               <div className="info-icon"><MapPin size={24} /></div>
               <div>
                 <h3>Địa chỉ cửa hàng</h3>
-                <p>123 Đường Bánh Tráng, Phường Trà Sữa, Quận 1, TP.HCM</p>
+                <p>123 Đường Nguyễn Trãi, Phường Bến Thành, Quận 1, TP.HCM</p>
               </div>
             </div>
             
@@ -76,7 +76,7 @@ const Contact = () => {
               <div className="info-icon"><Mail size={24} /></div>
               <div>
                 <h3>Email liên hệ</h3>
-                <p>support@snackhub.vn</p>
+                <p>support@sneakerhub.vn</p>
               </div>
             </div>
 
@@ -97,7 +97,7 @@ const Contact = () => {
 
           {/* Form Side */}
           <div className="contact-form-side">
-            <h2>Gửi lời nhắn cho SnackHub</h2>
+            <h2>Gửi lời nhắn cho SneakerHub</h2>
             {success && <div className="alert-success">{success}</div>}
             {error && <div className="alert-error">{error}</div>}
 

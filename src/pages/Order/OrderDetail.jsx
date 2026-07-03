@@ -177,7 +177,7 @@ const OrderDetail = () => {
               />
               <div>
                 <strong style={{fontSize: '1.2rem', display: 'block', marginBottom: '0.25rem'}}>{reviewingProduct?.name}</strong>
-                <span style={{color: '#64748b', fontSize: '0.9rem'}}>Cảm ơn bạn đã tin dùng sản phẩm của SnackHub!</span>
+                <span style={{color: '#64748b', fontSize: '0.9rem'}}>Cảm ơn bạn đã tin dùng sản phẩm của SneakerHub!</span>
               </div>
             </div>
 

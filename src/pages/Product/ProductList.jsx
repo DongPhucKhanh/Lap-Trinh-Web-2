@@ -149,8 +149,8 @@ const ProductList = () => {
   return (
     <div className="product-list-page">
       <div className="page-header-banner">
-        <h1>Thực Đơn Ăn Vặt</h1>
-        <p>Hàng trăm món ngon đang chờ bạn khám phá</p>
+        <h1>Bộ Sưu Tập Giày Thể Thao</h1>
+        <p>Hàng trăm mẫu giày đang chờ bạn khám phá</p>
       </div>
 
       <div className="product-list-container">
@@ -162,7 +162,7 @@ const ProductList = () => {
               <input 
                 type="text" 
                 name="search" 
-                placeholder="Tên món ăn..." 
+                placeholder="Tên đôi giày..." 
                 value={filter.search}
                 onChange={handleFilterChange}
               />
@@ -177,7 +177,7 @@ const ProductList = () => {
                 className={filter.categoryId === '' ? 'active' : ''}
                 onClick={() => { setFilter(prev => ({...prev, categoryId: ''})); setCurrentPage(1); }}
               >
-                Tất cả món ăn
+                Tất cả đôi giày
               </li>
               {categories.map(cat => (
                 <li 
@@ -262,7 +262,7 @@ const ProductList = () => {
               )}
             </>
           ) : (
-            <div className="empty-msg">Không tìm thấy món ăn nào phù hợp với bộ lọc.</div>
+            <div className="empty-msg">Không tìm thấy đôi giày nào phù hợp với bộ lọc.</div>
           )}
         </div>
       </div>

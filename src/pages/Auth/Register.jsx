@@ -83,12 +83,12 @@ const Register = () => {
               <div className="auth-brand-logo">
                 <span style={{color: 'white', fontWeight: 900, fontSize: '20px'}}>S</span>
               </div>
-              SnackHub
+              SneakerHub
             </div>
 
             <div className="auth-hero-text">
-              <h1>Tham Gia Kỷ Nguyên<br/>Ăn Vặt Của Chúng Tôi</h1>
-              <p>Trải nghiệm dịch vụ giao đồ ăn vặt cao cấp nhất. Sản phẩm được tuyển chọn, giao hàng siêu tốc và chất lượng tuyệt hảo.</p>
+              <h1>Tham Gia Kỷ Nguyên<br/>Giày Thể Thao Của Chúng Tôi</h1>
+              <p>Trải nghiệm dịch vụ giao giày thể thao cao cấp nhất. Sản phẩm được tuyển chọn, giao hàng siêu tốc và chất lượng tuyệt hảo.</p>
               
               <div className="auth-hero-badges">
                 <div className="hero-badge"><Truck size={18} color="#fcd34d" /> Giao Hàng Toàn Quốc</div>
@@ -121,7 +121,7 @@ const Register = () => {
           <div className="auth-premium-card" style={{ maxWidth: '600px', padding: '2.5rem' }}>
             <div className="auth-card-header" style={{ marginBottom: '2rem' }}>
               <h2>Tạo Tài Khoản</h2>
-              <p>Gia nhập cộng đồng yêu ẩm thực ngay hôm nay.</p>
+              <p>Gia nhập cộng đồng yêu thời trang ngay hôm nay.</p>
             </div>
 
             {error && (

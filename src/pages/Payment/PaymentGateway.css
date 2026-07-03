@@ -30,7 +30,7 @@
 }
 
 .pg-logo h1 span {
-  color: #ef4444; /* SnackHub Red */
+  color: #ef4444; /* SneakerHub Red */
 }
 
 .pg-logo-sub {
@@ -58,7 +58,7 @@
 .pg-container {
   max-width: 900px;
   margin: 0 auto;
-  background: #fff;
+  background: var(--white);
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   border: 1px solid #e5e7eb;
@@ -121,7 +121,7 @@
 .pg-qr-frame {
   position: relative;
   padding: 15px;
-  background: white;
+  background: var(--white);
   margin-bottom: 15px;
 }
 
@@ -191,7 +191,7 @@
 }
 
 .pg-divider span {
-  background: #fff;
+  background: var(--white);
   padding: 0 10px;
 }
 
@@ -277,7 +277,7 @@
   align-items: center;
   justify-content: center;
   height: 75px;
-  background: #fff;
+  background: var(--white);
   transition: border-color 0.2s;
   cursor: pointer;
 }

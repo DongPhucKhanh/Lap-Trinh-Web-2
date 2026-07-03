@@ -1,6 +1,6 @@
 .wishlist-container {
   padding: 20px;
-  background: white;
+  background: var(--white);
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.03);
 }
@@ -63,7 +63,7 @@
   display: block;
   width: 100%;
   aspect-ratio: 1;
-  background: #f8fafc;
+  background: var(--light);
   overflow: hidden;
 }
 

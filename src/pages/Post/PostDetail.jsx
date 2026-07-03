@@ -68,7 +68,7 @@ const PostDetail = () => {
 
           <div className="post-detail-featured-image">
             <img 
-              src={post.image ? (post.image.startsWith('http') ? post.image : `http://localhost:8080/uploads/${post.image}`) : 'https://images.unsplash.com/photo-1599490659213-e2b9527bd08c?auto=format&fit=crop&w=1200&q=80'} 
+              src={post.image ? (post.image.startsWith('http') ? post.image : `http://localhost:8080/uploads/${post.image}`) : 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80'} 
               alt={post.title} 
             />
           </div>

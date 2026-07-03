@@ -28,8 +28,8 @@ const PostList = () => {
     <div className="post-list-page">
       <div className="container">
         <div className="post-header text-center">
-          <h1>Góc Ăn Vặt & Tin Tức</h1>
-          <p>Khám phá những xu hướng ẩm thực mới nhất và các chương trình khuyến mãi từ SnackHub</p>
+          <h1>Góc Giày Thể Thao & Tin Tức</h1>
+          <p>Khám phá những xu hướng thời trang mới nhất và các chương trình khuyến mãi từ SneakerHub</p>
         </div>
 
         {posts.length === 0 ? (
@@ -44,7 +44,7 @@ const PostList = () => {
                 <Link to={`/post/${post.slug || post.id}`} className="post-img-link">
                   <div className="post-img-wrapper">
                     <img 
-                      src={post.image ? (post.image.startsWith('http') ? post.image : `http://localhost:8080/uploads/${post.image}`) : 'https://images.unsplash.com/photo-1599490659213-e2b9527bd08c?auto=format&fit=crop&w=600&q=80'} 
+                      src={post.image ? (post.image.startsWith('http') ? post.image : `http://localhost:8080/uploads/${post.image}`) : 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80'} 
                       alt={post.title} 
                     />
                     <div className="post-topic-badge">{post.topic?.name || 'Tin Tức'}</div>

@@ -119,7 +119,7 @@ const Checkout = () => {
         <CheckCircle size={80} color="#10b981" style={{ margin: '0 auto' }} />
         <h2 style={{ marginTop: '1rem', color: '#10b981' }}>Đặt hàng thành công!</h2>
         
-        <p style={{ marginTop: '1rem', color: '#64748b', fontSize: '1.1rem' }}>Cảm ơn bạn đã tin tưởng SnackHub. Đơn hàng của bạn đang được chuẩn bị và sẽ giao đến trong thời gian sớm nhất.</p>
+        <p style={{ marginTop: '1rem', color: '#64748b', fontSize: '1.1rem' }}>Cảm ơn bạn đã tin tưởng SneakerHub. Đơn hàng của bạn đang được chuẩn bị và sẽ giao đến trong thời gian sớm nhất.</p>
         
         <div style={{ marginTop: '2rem' }}>
           <button className="btn-primary" onClick={() => navigate('/')}>Tiếp tục mua sắm</button>

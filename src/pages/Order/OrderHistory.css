@@ -4,7 +4,7 @@
 
 .order-tabs {
   display: flex;
-  background: white;
+  background: var(--white);
   margin-bottom: 1rem;
   border-bottom: 1px solid #e2e8f0;
 }
@@ -33,7 +33,7 @@
 .order-search {
   display: flex;
   align-items: center;
-  background: #f1f5f9;
+  background: var(--light);
   padding: 0.75rem 1rem;
   border-radius: var(--radius-sm);
   margin-bottom: 1.5rem;
@@ -84,12 +84,12 @@
   align-items: center;
   padding: 1rem 1.5rem;
   border-bottom: 1px solid #f1f5f9;
-  background: #f8fafc;
+  background: var(--light);
 }
 
 .order-id {
   font-weight: 600;
-  color: var(--dark);
+  color: var(--text-main);
   margin-right: 1rem;
 }
 
@@ -144,7 +144,7 @@
 .oi-info h4 {
   margin: 0 0 0.25rem 0;
   font-size: 1rem;
-  color: var(--dark);
+  color: var(--text-main);
 }
 
 .oi-info p {
@@ -201,11 +201,11 @@
 }
 
 .order-actions .btn-outline {
-  background: white;
+  background: var(--white);
   border: 1px solid #cbd5e1;
   color: var(--text-main);
 }
 
 .order-actions .btn-outline:hover {
-  background: #f8fafc;
+  background: var(--light);
 }

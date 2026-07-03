@@ -10,7 +10,7 @@
 
 .section-header h2 {
   font-size: 1.5rem;
-  color: var(--dark);
+  color: var(--text-main);
   margin-bottom: 0.5rem;
 }
 
@@ -51,7 +51,7 @@
 
 .info-value {
   flex-grow: 1;
-  color: var(--dark);
+  color: var(--text-main);
   font-weight: 500;
 }
 
@@ -117,7 +117,7 @@
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: #f1f5f9;
+  background: var(--light);
   border: 2px dashed #cbd5e1;
   display: flex;
   align-items: center;

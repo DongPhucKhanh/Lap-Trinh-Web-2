@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 const ParallaxBannerSection = () => {
   return (
-    <section className="relative w-full h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden bg-fixed bg-center bg-cover" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1499028344343-cd173ffc68a9?q=80&w=2070&auto=format&fit=crop')" }}>
+    <section className="relative w-full h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden bg-fixed bg-center bg-cover" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1460353581641-37baddab0fa2?q=80&w=2070&auto=format&fit=crop')" }}>
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/60 z-0"></div>
 

@@ -13,10 +13,10 @@ const HeroSection = ({ banners }) => {
   const activeBanners = banners && banners.length > 0 ? banners : [
     {
       id: 'default-1',
-      title: 'Khám phá hương vị hoàn hảo',
-      description: 'Trải nghiệm thiên đường ăn vặt với hàng trăm món ngon được tuyển chọn kỹ lưỡng dành riêng cho bạn.',
+      title: 'Khám phá phong cách hoàn hảo',
+      description: 'Trải nghiệm thiên đường giày thể thao với hàng trăm mẫu giày được tuyển chọn kỹ lưỡng dành riêng cho bạn.',
       link: '/product',
-      image: 'https://images.unsplash.com/photo-1559598467-f8b76c8155d0?q=80&w=1920&auto=format&fit=crop'
+      image: 'https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?q=80&w=1920&auto=format&fit=crop'
     }
   ];
 

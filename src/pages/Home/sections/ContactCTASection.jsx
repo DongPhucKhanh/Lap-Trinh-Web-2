@@ -60,7 +60,7 @@ const ContactCTASection = () => {
           fontSize: '1.15rem', color: 'rgba(255,255,255,0.7)',
           marginBottom: '40px', lineHeight: 1.7, maxWidth: '520px', margin: '0 auto 40px'
         }}>
-          Đội ngũ SnackHub luôn sẵn sàng lắng nghe và hỗ trợ bạn. Hãy liên hệ với chúng tôi 
+          Đội ngũ SneakerHub luôn sẵn sàng lắng nghe và hỗ trợ bạn. Hãy liên hệ với chúng tôi 
           để được tư vấn nhanh nhất!
         </p>
 

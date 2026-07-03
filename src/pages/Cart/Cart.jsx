@@ -13,7 +13,7 @@ const Cart = () => {
       <div className="cart-empty-container">
         <ShoppingBag size={80} color="#cbd5e1" />
         <h2>Giỏ hàng của bạn đang trống</h2>
-        <p>Có vẻ như bạn chưa chọn món ăn vặt nào. Khám phá ngay các món ngon nhé!</p>
+        <p>Có vẻ như bạn chưa chọn món giày thể thao nào. Khám phá ngay các mẫu giày nhé!</p>
         <Link to="/" className="btn-primary" style={{ marginTop: '20px', display: 'inline-block', padding: '10px 20px', background: '#ff6b6b', color: 'white', borderRadius: '8px' }}>
           Quay lại mua sắm
         </Link>

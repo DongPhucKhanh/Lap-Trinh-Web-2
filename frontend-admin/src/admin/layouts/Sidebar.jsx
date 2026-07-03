@@ -1,10 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Package, Users, Settings, LogOut, Tag, Bookmark, FileText, ShoppingCart, MessageSquare, Image, Menu } from 'lucide-react';
+import orderService from '../services/orderService';
 
 const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    const fetchPendingOrders = () => {
+      orderService.getAll().then(res => {
+        // Lấy danh sách các đơn đang chờ xác nhận
+        const pendingOrders = res.data.filter(order => order.status === 0);
+        
+        // Tìm ID đơn hàng lớn nhất (mới nhất) trong danh sách chờ
+        const maxPendingId = pendingOrders.length > 0 ? Math.max(...pendingOrders.map(o => o.id)) : 0;
+        
+        // Nếu admin đang đứng ở trang Đơn hàng, đánh dấu là đã xem tới ID mới nhất
+        if (location.pathname.startsWith('/admin/order')) {
+          localStorage.setItem('lastViewedOrderId', maxPendingId);
+        }
+
+        const lastViewedId = parseInt(localStorage.getItem('lastViewedOrderId') || '0', 10);
+        
+        // Chỉ đếm những đơn hàng chờ xác nhận có ID lớn hơn ID đã xem cuối cùng
+        const newUnseenCount = pendingOrders.filter(o => o.id > lastViewedId).length;
+        
+        setPendingCount(newUnseenCount);
+      }).catch(err => console.error("Error fetching pending orders for sidebar", err));
+    };
+
+    fetchPendingOrders();
+    const intervalId = setInterval(fetchPendingOrders, 3000);
+    return () => clearInterval(intervalId);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     if (window.confirm('Bạn có chắc chắn muốn đăng xuất?')) {
@@ -32,7 +62,7 @@ const Sidebar = () => {
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
-        <div className="admin-logo">🛡️ AdminPanel</div>
+        <div className="admin-logo">🛡️ Trang Quản Trị</div>
       </div>
       <nav className="sidebar-nav">
         {navItems.map(item => (
@@ -40,8 +70,19 @@ const Sidebar = () => {
             key={item.path} 
             to={item.path} 
             className={`nav-item ${location.pathname.startsWith(item.path) && (item.path !== '/admin' || location.pathname === '/admin') ? 'active' : ''}`}
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
           >
-            {item.icon} {item.label}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {item.icon} {item.label}
+            </div>
+            {item.path === '/admin/order' && pendingCount > 0 && (
+              <span style={{
+                background: '#ef4444', color: 'white', fontSize: '12px', fontWeight: 'bold',
+                padding: '2px 8px', borderRadius: '12px', marginLeft: 'auto'
+              }}>
+                {pendingCount}
+              </span>
+            )}
           </Link>
         ))}
       </nav>

@@ -222,6 +222,14 @@
   font-size: 1.05rem;
   line-height: 1.8;
   color: var(--dark);
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.html-content * {
+  max-width: 100% !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
 }
 
 .html-content p {
@@ -230,8 +238,10 @@
 
 .html-content img {
   max-width: 100%;
+  height: auto;
   border-radius: var(--radius-sm);
-  margin: 2rem 0;
+  margin: 2rem auto;
+  display: block;
 }
 
 .html-content h2, .html-content h3 {

@@ -22,8 +22,6 @@ const ProductDetail = () => {
   const { user } = useContext(AuthContext);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [reviews, setReviews] = useState([]);
-  const [reviewText, setReviewText] = useState('');
-  const [reviewRating, setReviewRating] = useState(5);
 
   useEffect(() => {
     setLoading(true);
@@ -59,8 +57,12 @@ const ProductDetail = () => {
       } else {
         setIsWishlisted(false);
       }
-      const storedReviews = JSON.parse(localStorage.getItem(`snackhub_reviews_${product.id}`) || '[]');
-      setReviews(storedReviews);
+      
+      api.get(`/reviews/product/${product.id}`)
+        .then(res => {
+          setReviews(res.data || []);
+        })
+        .catch(err => console.error("Error fetching reviews", err));
     }
   }, [product, user]);
 
@@ -97,23 +99,6 @@ const ProductDetail = () => {
       console.error(error);
       toast.error('Có lỗi xảy ra, vui lòng thử lại sau.');
     }
-  };
-
-  const handleSubmitReview = (e) => {
-    e.preventDefault();
-    if (!reviewText.trim()) return;
-    const newReview = {
-      id: Date.now(),
-      rating: reviewRating,
-      text: reviewText,
-      author: 'Khách hàng',
-      date: new Date().toLocaleDateString('vi-VN')
-    };
-    const updatedReviews = [...reviews, newReview];
-    setReviews(updatedReviews);
-    localStorage.setItem(`snackhub_reviews_${product.id}`, JSON.stringify(updatedReviews));
-    setReviewText('');
-    setReviewRating(5);
   };
 
   const mainImageUrl = product.image 
@@ -238,35 +223,20 @@ const ProductDetail = () => {
                     {reviews.map(r => (
                       <div key={r.id} style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                          <strong>{r.author}</strong>
-                          <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>{r.date}</span>
+                          <strong>{r.userName}</strong>
+                          <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>{new Date(r.createdAt).toLocaleString('vi-VN')}</span>
                         </div>
                         <div style={{ marginBottom: '8px', color: '#f59e0b' }}>{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</div>
-                        <p style={{ margin: 0, color: '#475569' }}>{r.text}</p>
+                        <p style={{ margin: 0, color: '#475569' }}>{r.comment}</p>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p style={{ color: '#94a3b8', marginBottom: '20px' }}>Chưa có đánh giá nào. Hãy là người đầu tiên!</p>
+                  <p style={{ color: '#94a3b8', marginBottom: '20px' }}>Chưa có đánh giá nào. Hãy là người mua đầu tiên để lại nhận xét nhé!</p>
                 )}
-                <form onSubmit={handleSubmitReview} style={{ borderTop: '1px solid #e2e8f0', paddingTop: '20px' }}>
-                  <h4 style={{ marginBottom: '12px' }}>Viết đánh giá của bạn</h4>
-                  <div style={{ marginBottom: '12px' }}>
-                    <label style={{ marginRight: '8px', fontWeight: '500' }}>Đánh giá: </label>
-                    <select value={reviewRating} onChange={e => setReviewRating(Number(e.target.value))} style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #cbd5e1' }}>
-                      {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} sao</option>)}
-                    </select>
-                  </div>
-                  <textarea 
-                    value={reviewText} 
-                    onChange={e => setReviewText(e.target.value)} 
-                    placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này..."
-                    style={{ width: '100%', minHeight: '80px', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', resize: 'vertical', fontFamily: 'inherit', fontSize: '0.95rem' }}
-                  />
-                  <button type="submit" style={{ marginTop: '12px', padding: '10px 24px', borderRadius: '8px', background: 'var(--primary)', color: 'white', border: 'none', cursor: 'pointer', fontWeight: '600' }}>
-                    Gửi đánh giá
-                  </button>
-                </form>
+                <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '20px', color: '#64748b', fontSize: '0.9rem' }}>
+                  <em>* Đánh giá chỉ có thể được viết sau khi khách hàng đã mua và nhận sản phẩm thành công thông qua mục Đơn hàng của tôi.</em>
+                </div>
               </div>
             )}
           </div>

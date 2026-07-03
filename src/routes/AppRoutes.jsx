@@ -12,6 +12,8 @@ import ProductDetail from '../pages/Product/ProductDetail';
 import CategoryPage from '../pages/Category/CategoryPage';
 import Cart from '../pages/Cart/Cart';
 import Checkout from '../pages/Checkout/Checkout';
+import PaymentResult from '../pages/Checkout/PaymentResult';
+import PaymentGateway from '../pages/Payment/PaymentGateway';
 import OrderHistory from '../pages/Order/OrderHistory';
 import OrderDetail from '../pages/Order/OrderDetail';
 import Login from '../pages/Auth/Login';
@@ -38,6 +40,8 @@ const AppRoutes = () => {
         <Route path="category/:id" element={<CategoryPage />} />
         <Route path="cart" element={<Cart />} />
         <Route path="checkout" element={<Checkout />} />
+        <Route path="payment-result" element={<PaymentResult />} />
+        <Route path="payment-gateway" element={<PaymentGateway />} />
         <Route path="contact" element={<Contact />} />
         <Route path="about" element={<About />} />
         <Route path="post" element={<PostList />} />

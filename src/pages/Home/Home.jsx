@@ -17,21 +17,34 @@ const Home = () => {
   const [brands, setBrands] = useState([]);
   const [banners, setBanners] = useState([]);
   const [posts, setPosts] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Mock flash sale end time (tomorrow at midnight)
-  const flashSaleEndTime = new Date();
-  flashSaleEndTime.setHours(24, 0, 0, 0);
+  // Persistent flash sale end time (e.g. 48 hours from first visit)
+  const getFlashSaleEndTime = () => {
+    const savedTime = localStorage.getItem('flashSaleEndTime');
+    if (savedTime && new Date(savedTime) > new Date()) {
+      return new Date(savedTime);
+    }
+    // Set new end time: 48 hours from now
+    const newTime = new Date();
+    newTime.setHours(newTime.getHours() + 48);
+    localStorage.setItem('flashSaleEndTime', newTime.toISOString());
+    return newTime;
+  };
+  
+  const [flashSaleEndTime] = useState(getFlashSaleEndTime());
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [prodRes, catRes, brandRes, postRes, bannerRes] = await Promise.all([
+        const [prodRes, catRes, brandRes, postRes, bannerRes, reviewRes] = await Promise.all([
           api.get('/products'),
           api.get('/categories'),
           api.get('/brands').catch(() => ({ data: [] })),
           api.get('/posts').catch(() => ({ data: [] })),
-          api.get('/banners').catch(() => ({ data: [] }))
+          api.get('/banners').catch(() => ({ data: [] })),
+          api.get('/reviews/latest').catch(() => ({ data: [] }))
         ]);
         
         setProducts(prodRes.data || []);
@@ -39,6 +52,7 @@ const Home = () => {
         setBrands(brandRes.data || []);
         setPosts(postRes.data || []);
         setBanners((bannerRes.data || []).filter(b => b.status === 1));
+        setReviews(reviewRes.data || []);
       } catch (err) {
         console.error("Error fetching home data:", err);
       } finally {
@@ -72,7 +86,7 @@ const Home = () => {
       <FlashSaleSection products={flashSaleProducts.length > 0 ? flashSaleProducts : comboProducts} flashSaleEndTime={flashSaleEndTime} />
       <ParallaxBannerSection />
       <BestSellerSection products={bestSellers} />
-      <TestimonialSection />
+      <TestimonialSection reviews={reviews} />
       <ContactCTASection />
       <BlogNewsletterSection posts={latestPosts} />
     </div>

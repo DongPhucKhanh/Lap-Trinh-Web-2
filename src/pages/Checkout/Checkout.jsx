@@ -36,11 +36,16 @@ const Checkout = () => {
   }, [user]);
   
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [placedOrder, setPlacedOrder] = useState(null);
   const [error, setError] = useState('');
 
-  if (cart.length === 0 && !success) {
-    navigate('/cart');
+  useEffect(() => {
+    if (cart.length === 0 && !placedOrder) {
+      navigate('/cart');
+    }
+  }, [cart.length, placedOrder, navigate]);
+
+  if (cart.length === 0 && !placedOrder) {
     return null;
   }
 
@@ -79,6 +84,7 @@ const Checkout = () => {
       deliveryEmail: formData.deliveryEmail,
       deliveryAddress: formData.deliveryAddress,
       note: formData.note,
+      paymentMethod: formData.paymentMethod,
       ...(user && { userId: user.id }),
       items: cart.map(item => ({
         productId: item.id,
@@ -88,9 +94,17 @@ const Checkout = () => {
     };
 
     try {
-      await api.post('/orders/checkout', payload);
-      setSuccess(true);
+      const res = await api.post('/orders/checkout', payload);
+      const newOrder = res.data;
+
+      // Lưu lại order và tổng tiền
+      newOrder.totalAmount = cartTotal;
+      setPlacedOrder(newOrder);
       clearCart();
+      
+      if (formData.paymentMethod === 'transfer') {
+        navigate('/payment-gateway', { state: { order: newOrder, previousCart: cart } });
+      }
     } catch (err) {
       console.error(err);
       setError('Đã có lỗi xảy ra khi đặt hàng. Vui lòng thử lại sau.');
@@ -99,13 +113,18 @@ const Checkout = () => {
     }
   };
 
-  if (success) {
+  if (placedOrder && formData.paymentMethod !== 'transfer') {
     return (
-      <div className="checkout-success">
-        <CheckCircle size={80} color="#10b981" />
-        <h2>Đặt hàng thành công!</h2>
-        <p>Cảm ơn bạn đã tin tưởng SnackHub. Đơn hàng của bạn đang được chuẩn bị và sẽ giao đến trong thời gian sớm nhất.</p>
-        <button className="btn-primary mt-4" onClick={() => navigate('/')}>Tiếp tục mua sắm</button>
+      <div className="checkout-success" style={{ padding: '3rem 2rem', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+        <CheckCircle size={80} color="#10b981" style={{ margin: '0 auto' }} />
+        <h2 style={{ marginTop: '1rem', color: '#10b981' }}>Đặt hàng thành công!</h2>
+        
+        <p style={{ marginTop: '1rem', color: '#64748b', fontSize: '1.1rem' }}>Cảm ơn bạn đã tin tưởng SnackHub. Đơn hàng của bạn đang được chuẩn bị và sẽ giao đến trong thời gian sớm nhất.</p>
+        
+        <div style={{ marginTop: '2rem' }}>
+          <button className="btn-primary" onClick={() => navigate('/')}>Tiếp tục mua sắm</button>
+          <button className="btn-outline" onClick={() => navigate('/user/order')} style={{ marginLeft: '15px' }}>Xem đơn hàng</button>
+        </div>
       </div>
     );
   }
@@ -187,7 +206,7 @@ const Checkout = () => {
                 <input type="radio" name="paymentMethod" value="transfer" checked={formData.paymentMethod === 'transfer'} onChange={handleChange} />
                 <div className="payment-content">
                   <CreditCard size={24} />
-                  <span>Chuyển khoản ngân hàng</span>
+                  <span>Thanh toán Online (Quét mã QR)</span>
                 </div>
               </label>
             </div>

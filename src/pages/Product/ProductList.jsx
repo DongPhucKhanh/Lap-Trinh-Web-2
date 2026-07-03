@@ -71,8 +71,8 @@ const ProductList = () => {
   const fetchProducts = () => {
     setLoading(true);
     const params = {
-      page: currentPage - 1, // Spring Data JPA is 0-indexed
-      size: itemsPerPage,
+      page: filter.saleOnly ? 0 : currentPage - 1,
+      size: filter.saleOnly ? 1000 : itemsPerPage,
       sort: filter.sort,
       direction: filter.direction
     };
@@ -85,7 +85,12 @@ const ProductList = () => {
         // Client-side filter for saleOnly since API might not support it directly
         if (filter.saleOnly) {
           content = content.filter(p => p.productSale && p.productSale.pricesale);
-          setProducts(content);
+          
+          // Local pagination for sale products
+          const start = (currentPage - 1) * itemsPerPage;
+          const paginatedContent = content.slice(start, start + itemsPerPage);
+          
+          setProducts(paginatedContent);
           setTotalElements(content.length);
           setTotalPages(Math.ceil(content.length / itemsPerPage));
         } else {

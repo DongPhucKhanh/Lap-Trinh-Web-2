@@ -37,7 +37,15 @@ const testimonials = [
   }
 ];
 
-const TestimonialSection = () => {
+const TestimonialSection = ({ reviews = [] }) => {
+  const displayReviews = reviews.length > 0 ? reviews.map((r, i) => ({
+    name: r.userName,
+    role: 'Khách hàng',
+    text: r.comment,
+    stars: r.rating,
+    color: ['#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#f1c40f'][i % 5]
+  })) : testimonials;
+
   return (
     <section className="py-24 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
@@ -70,7 +78,7 @@ const TestimonialSection = () => {
             autoplay={{ delay: 4000, disableOnInteraction: false }}
             className="pb-16"
           >
-            {testimonials.map((t, index) => (
+            {displayReviews.map((t, index) => (
               <SwiperSlide key={index}>
                 <div className="bg-light rounded-[32px] p-8 h-full flex flex-col relative border border-gray-100 hover:shadow-xl transition-shadow duration-300">
                   <Quote className="absolute top-8 right-8 text-primary/10" size={60} />

@@ -4,6 +4,7 @@ import AppRoutes from './routes/AppRoutes';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { ToastContainer } from 'react-toastify';
+import ScrollToTop from './components/ScrollToTop';
 import Lenis from '@studio-freight/lenis';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
@@ -37,6 +38,7 @@ function App() {
   return (
     <AuthProvider>
       <CartProvider>
+        <ScrollToTop />
         <AppRoutes />
         <ToastContainer position="bottom-right" autoClose={3000} theme="colored" />
       </CartProvider>

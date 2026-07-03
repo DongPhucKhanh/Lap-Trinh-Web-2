@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { LogIn, User, Lock } from 'lucide-react';
+import { LogIn, User, Lock, CheckCircle, Truck, ShieldCheck, Star } from 'lucide-react';
 import './Auth.css';
 
 const Login = () => {
@@ -32,57 +32,127 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-container">
-        <div className="auth-header">
-          <div className="auth-icon-wrapper">
-            <LogIn size={32} color="#ff6b6b" />
+    <div className="auth-page-premium">
+      <div className="auth-split-layout">
+        
+        {/* LEFT SIDE: STORYTELLING HERO */}
+        <div className="auth-hero-section">
+          <div className="auth-hero-bg"></div>
+          <div className="auth-hero-overlay"></div>
+          
+          <div className="auth-floating-element auth-float-1">
+            <img src="https://placehold.co/100x100/transparent/fff?text=🍿" alt="snack" style={{width: '60px', filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.3))'}} />
           </div>
-          <h2>Chào mừng trở lại!</h2>
-          <p>Đăng nhập để tiếp tục khám phá thế giới ăn vặt</p>
+          <div className="auth-floating-element auth-float-2">
+            <img src="https://placehold.co/100x100/transparent/fff?text=🍫" alt="snack" style={{width: '80px', filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.3))'}} />
+          </div>
+
+          <div className="auth-hero-content">
+            <div className="auth-brand">
+              <div className="auth-brand-logo">
+                <span style={{color: 'white', fontWeight: 900, fontSize: '20px'}}>S</span>
+              </div>
+              SnackHub
+            </div>
+
+            <div className="auth-hero-text">
+              <h1>Khám Phá Niềm Vui<br/>Trong Từng Hương Vị</h1>
+              <p>Tham gia cùng hàng ngàn tín đồ ăn vặt thưởng thức những món ngon thượng hạng giao hàng toàn quốc. Hương vị yêu thích chỉ cách bạn một cú click.</p>
+              
+              <div className="auth-hero-badges">
+                <div className="hero-badge"><Truck size={18} color="#fcd34d" /> Giao Hàng Toàn Quốc</div>
+                <div className="hero-badge"><CheckCircle size={18} color="#10b981" /> Tươi Ngon Mỗi Ngày</div>
+                <div className="hero-badge"><ShieldCheck size={18} color="#60a5fa" /> Thanh Toán An Toàn</div>
+              </div>
+            </div>
+
+            <div className="auth-hero-stats">
+              <div className="stat-item">
+                <h3>500+</h3>
+                <p>Sản Phẩm</p>
+              </div>
+              <div className="stat-item">
+                <h3>12k+</h3>
+                <p>Khách Hàng</p>
+              </div>
+              <div className="stat-item">
+                <h3 style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+                  4.9 <Star size={24} fill="#fcd34d" color="#fcd34d" />
+                </h3>
+                <p>Đánh Giá Tốt</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {error && <div className="auth-error">{error}</div>}
+        {/* RIGHT SIDE: AUTH CARD */}
+        <div className="auth-form-section">
+          <div className="auth-premium-card">
+            <div className="auth-card-header">
+              <h2>Chào mừng trở lại</h2>
+              <p>Vui lòng nhập thông tin để đăng nhập.</p>
+            </div>
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="auth-input-group">
-            <User size={20} className="input-icon" />
-            <input 
-              type="text" 
-              placeholder="Tên đăng nhập" 
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required 
-            />
+            {error && (
+              <div className="premium-alert error">
+                <CheckCircle size={18} /> {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit}>
+              <div className="premium-form-group">
+                <div className="premium-input-wrapper">
+                  <User size={20} className="premium-input-icon" />
+                  <input 
+                    type="text" 
+                    className="premium-input"
+                    placeholder=" " 
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required 
+                  />
+                  <label className="premium-floating-label">Tên đăng nhập</label>
+                </div>
+              </div>
+
+              <div className="premium-form-group">
+                <div className="premium-input-wrapper">
+                  <Lock size={20} className="premium-input-icon" />
+                  <input 
+                    type="password" 
+                    className="premium-input"
+                    placeholder=" " 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required 
+                  />
+                  <label className="premium-floating-label">Mật khẩu</label>
+                </div>
+              </div>
+
+              <div className="auth-premium-options">
+                <label className="premium-checkbox">
+                  <input type="checkbox" />
+                  <span>Ghi nhớ đăng nhập</span>
+                </label>
+                <Link to="/forgot-password" className="premium-forgot-link">Quên mật khẩu?</Link>
+              </div>
+
+              <button type="submit" className="btn-premium-submit" disabled={loading}>
+                {loading ? 'Đang xử lý...' : 'Đăng Nhập'}
+              </button>
+            </form>
+
+            <div className="premium-divider">
+              <span>HOẶC</span>
+            </div>
+
+            <div className="auth-premium-footer">
+              Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
+            </div>
           </div>
-
-          <div className="auth-input-group">
-            <Lock size={20} className="input-icon" />
-            <input 
-              type="password" 
-              placeholder="Mật khẩu" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required 
-            />
-          </div>
-
-          <div className="auth-options">
-            <label className="remember-me">
-              <input type="checkbox" />
-              <span>Ghi nhớ đăng nhập</span>
-            </label>
-            <Link to="/forgot-password" className="forgot-password">Quên mật khẩu?</Link>
-          </div>
-
-          <button type="submit" className="btn-auth-submit" disabled={loading}>
-            {loading ? 'ĐANG XỬ LÝ...' : 'ĐĂNG NHẬP'}
-          </button>
-        </form>
-
-        <div className="auth-footer">
-          Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
         </div>
+
       </div>
     </div>
   );

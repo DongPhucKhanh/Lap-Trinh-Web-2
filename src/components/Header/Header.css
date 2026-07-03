@@ -25,7 +25,7 @@
   height: 40px;
 }
 .topbar-container {
-  max-width: 1200px;
+  max-width: 1050px;
   margin: 0 auto;
   padding: 0 2rem;
   display: flex;
@@ -56,7 +56,7 @@
   border-bottom: 1px solid #f1f5f9;
 }
 .header-container {
-  max-width: 1200px;
+  max-width: 1050px;
   margin: 0 auto;
   padding: 0 2rem;
   display: flex;
@@ -310,7 +310,7 @@
   border-bottom: 1px solid #f1f5f9;
 }
 .nav-bottom-container {
-  max-width: 1200px;
+  max-width: 1050px;
   margin: 0 auto;
   padding: 0 2rem;
   display: flex;

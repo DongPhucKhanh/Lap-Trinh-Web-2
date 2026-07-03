@@ -3,6 +3,18 @@ import { FileText, ArrowLeft, Save } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import uploadService from '../../services/uploadService';
 import postService from '../../services/postService';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
+
+const modules = {
+  toolbar: [
+    [{ 'header': [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+    [{ 'list': 'ordered' }, { 'list': 'bullet' }, { 'indent': '-1' }, { 'indent': '+1' }],
+    ['link', 'image', 'video'],
+    ['clean']
+  ],
+};
 
 const PostCreate = () => {
   const navigate = useNavigate();
@@ -92,11 +104,12 @@ const PostCreate = () => {
 
           <div className="form-group" style={{ gridColumn: '1 / -1' }}>
             <label>Nội dung chi tiết</label>
-            <textarea 
-              rows="8" 
-              style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+            <ReactQuill 
+              theme="snow" 
+              modules={modules}
               value={formData.detail || ''} 
-              onChange={e => setFormData({...formData, detail: e.target.value})} 
+              onChange={content => setFormData({...formData, detail: content})} 
+              style={{ backgroundColor: 'white', height: '400px', marginBottom: '50px' }}
             />
           </div>
           

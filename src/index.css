@@ -47,3 +47,10 @@ input, textarea { font-family: inherit; }
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
+
+/* Fix Quill Editor Image Overflow */
+.ql-editor img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+}

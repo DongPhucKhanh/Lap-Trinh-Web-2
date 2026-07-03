@@ -109,6 +109,10 @@ public class OrderController {
             userRepository.findById(userId).ifPresent(order::setUser);
         }
 
+        // Lưu phương thức thanh toán (cod hoặc transfer)
+        String paymentMethod = (String) payload.get("paymentMethod");
+        order.setPaymentMethod(paymentMethod);
+
         // --- Lưu Order trước để có ID ---
         Order savedOrder = orderRepository.save(order);
 
@@ -167,7 +171,9 @@ public class OrderController {
 
         // Gửi email xác nhận đơn hàng
         if (savedOrder.getDeliveryEmail() != null && !savedOrder.getDeliveryEmail().isBlank()) {
-            emailService.sendOrderConfirmation(savedOrder.getDeliveryEmail(), savedOrder, detailList);
+            if (!"transfer".equals(savedOrder.getPaymentMethod())) {
+                emailService.sendOrderConfirmation(savedOrder.getDeliveryEmail(), savedOrder, detailList);
+            }
         }
 
         return ResponseEntity.ok(savedOrder);
@@ -197,7 +203,13 @@ public class OrderController {
                     
                     // Gửi email thông báo thay đổi trạng thái
                     if (updatedOrder.getDeliveryEmail() != null && !updatedOrder.getDeliveryEmail().isBlank()) {
-                        emailService.sendOrderStatusChange(updatedOrder.getDeliveryEmail(), updatedOrder, newStatus);
+                        // Nếu là thanh toán chuyển khoản và admin vừa xác nhận đơn (status 1) -> Gửi mail Đặt hàng thành công
+                        if (newStatus == 1 && "transfer".equals(updatedOrder.getPaymentMethod())) {
+                            List<OrderDetail> detailList = orderDetailRepository.findByOrderId(updatedOrder.getId());
+                            emailService.sendOrderConfirmation(updatedOrder.getDeliveryEmail(), updatedOrder, detailList);
+                        } else {
+                            emailService.sendOrderStatusChange(updatedOrder.getDeliveryEmail(), updatedOrder, newStatus);
+                        }
                     }
                     
                     return ResponseEntity.ok(updatedOrder);

@@ -90,6 +90,8 @@ public class SecurityConfig {
                     "/api/topics", "/api/topics/**",
                     "/api/brands", "/api/brands/**",
                     "/api/banners", "/api/banners/**",
+                    "/api/reviews/product/**",
+                    "/api/reviews/latest",
                     "/uploads/**",
                     "/error"
                 ).permitAll()

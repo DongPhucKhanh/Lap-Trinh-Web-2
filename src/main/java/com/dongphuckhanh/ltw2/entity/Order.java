@@ -72,6 +72,9 @@ public class Order {
     @Column(name = "cancel_reason", columnDefinition = "TEXT")
     private String cancelReason;
 
+    @Column(name = "payment_method")
+    private String paymentMethod;
+
     /** Danh sách chi tiết sản phẩm trong đơn hàng */
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderDetail> orderDetails;

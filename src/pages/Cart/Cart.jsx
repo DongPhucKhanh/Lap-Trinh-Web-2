@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CartContext } from '../../context/CartContext';
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from 'lucide-react';
+import { toast } from 'react-toastify';
 import './Cart.css';
 
 const Cart = () => {
@@ -31,12 +32,19 @@ const Cart = () => {
       <div className="cart-content">
         <div className="cart-items">
           {cart.map(item => (
-            <div key={item.id} className="cart-item">
+            <div key={item.cartItemId} className="cart-item">
               <div className="cart-item-img">
                 <img src={item.image ? (item.image.startsWith('http') ? item.image : `http://localhost:8080/uploads/${item.image}`) : 'https://placehold.co/100x100/f4f7f6/636e72'} alt={item.name} />
               </div>
               <div className="cart-item-details">
                 <h3>{item.name || item.title}</h3>
+                {(item.selectedColor || item.selectedSize) && (
+                  <p className="item-variant text-sm text-gray-500 mb-1">
+                    {item.selectedColor && `Màu: ${item.selectedColor}`} 
+                    {item.selectedColor && item.selectedSize && ' | '}
+                    {item.selectedSize && `Size: ${item.selectedSize}`}
+                  </p>
+                )}
                 {item.productSale?.pricesale ? (
                   <p className="item-price">
                     {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.productSale.pricesale)}
@@ -50,11 +58,18 @@ const Cart = () => {
               </div>
               <div className="cart-item-actions">
                 <div className="quantity-control">
-                  <button onClick={() => updateQuantity(item.id, item.quantity - 1)}><Minus size={16}/></button>
+                  <button onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}><Minus size={16}/></button>
                   <span>{item.quantity}</span>
-                  <button onClick={() => updateQuantity(item.id, item.quantity + 1)}><Plus size={16}/></button>
+                  <button onClick={() => {
+                    const maxQty = item.productStore?.qty || 0;
+                    if (item.quantity < maxQty) {
+                      updateQuantity(item.cartItemId, item.quantity + 1);
+                    } else {
+                      toast.warning(`Kho chỉ còn tối đa ${maxQty} sản phẩm!`);
+                    }
+                  }}><Plus size={16}/></button>
                 </div>
-                <button className="btn-remove" onClick={() => removeFromCart(item.id)}><Trash2 size={20}/></button>
+                <button className="btn-remove" onClick={() => removeFromCart(item.cartItemId)}><Trash2 size={20}/></button>
               </div>
             </div>
           ))}

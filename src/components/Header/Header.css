@@ -4,16 +4,23 @@
   background: var(--white);
   box-shadow: var(--shadow-sm);
   position: relative;
-  z-index: 1000;
+  z-index: 9999;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
 }
 
 .header-wrapper.scrolled {
-  position: sticky;
-  top: -40px; /* Hide topbar on scroll */
-  background: var(--glass-bg);
+  position: fixed;
+  top: 0;
+  left: 0;
+  transform: translateY(-40px); /* Hide topbar on scroll */
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.header-wrapper.scrolled.hidden {
+  transform: translateY(-150px); /* Completely hide header */
 }
 
 /* ================= TOPBAR ================= */

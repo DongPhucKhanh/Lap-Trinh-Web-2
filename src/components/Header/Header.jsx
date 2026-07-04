@@ -16,7 +16,11 @@ const Header = () => {
   const [categories, setCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHidden, setIsHidden] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(120);
+  const headerRef = React.useRef(null);
+  const lastScrollY = React.useRef(0);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('theme') === 'dark';
   });
@@ -32,11 +36,28 @@ const Header = () => {
   }, [isDarkMode]);
 
   useEffect(() => {
+    if (headerRef.current) {
+      setHeaderHeight(headerRef.current.offsetHeight);
+    }
     // Fetch categories
     api.get('/categories').then(res => setCategories(res.data)).catch(console.error);
 
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      const currentScrollY = window.scrollY;
+      
+      // Update scrolled state (to trigger sticky UI)
+      setIsScrolled(currentScrollY > 50);
+      
+      // Handle hide/show based on scroll direction
+      if (currentScrollY > lastScrollY.current && currentScrollY > 150) {
+        // Scrolling down and past the threshold -> hide
+        setIsHidden(true);
+      } else if (currentScrollY < lastScrollY.current) {
+        // Scrolling up -> show
+        setIsHidden(false);
+      }
+      
+      lastScrollY.current = currentScrollY;
     };
     
     const handleClickOutside = (e) => {
@@ -72,7 +93,8 @@ const Header = () => {
 
   return (
     <>
-      <header className={`header-wrapper ${isScrolled ? 'scrolled' : ''}`}>
+      {isScrolled && <div style={{ height: `${headerHeight}px` }} />}
+      <header ref={headerRef} className={`header-wrapper ${isScrolled ? 'scrolled' : ''} ${isHidden ? 'hidden' : ''}`}>
         {/* Topbar */}
         <div className="topbar">
           <div className="topbar-container">

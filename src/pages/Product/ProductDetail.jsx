@@ -18,10 +18,13 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('desc');
   const [mainImgIndex, setMainImgIndex] = useState(0);
-  const { addToCart } = useContext(CartContext);
+  const { addToCart, cart } = useContext(CartContext);
   const { user } = useContext(AuthContext);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [reviews, setReviews] = useState([]);
+  const [variants, setVariants] = useState([]);
+  const [selectedColor, setSelectedColor] = useState('');
+  const [selectedSize, setSelectedSize] = useState('');
 
   useEffect(() => {
     setLoading(true);
@@ -29,6 +32,22 @@ const ProductDetail = () => {
     api.get(`/products/${id || slug}`)
       .then(res => {
         setProduct(res.data);
+        // Fetch variants
+        api.get(`/product-variants/product/${res.data.id}`).then(vRes => {
+          setVariants(vRes.data || []);
+          if (vRes.data && vRes.data.length > 0) {
+            const firstColor = vRes.data[0].color;
+            setSelectedColor(firstColor);
+            const sizesForFirstColor = vRes.data.filter(v => v.color === firstColor && v.qty > 0);
+            if (sizesForFirstColor.length > 0) {
+              setSelectedSize(sizesForFirstColor[0].size);
+            } else {
+              // If no size in stock for first color, just select first size anyway
+              setSelectedSize(vRes.data.filter(v => v.color === firstColor)[0]?.size);
+            }
+          }
+        }).catch(err => console.error('Error fetching variants', err));
+
         // Fetch related
         api.get('/products').then(prodRes => {
           const related = prodRes.data
@@ -76,7 +95,45 @@ const ProductDetail = () => {
   );
 
   const handleAddToCart = () => {
-    addToCart(product, quantity);
+    if (!user) {
+      toast.info('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!');
+      navigate('/login');
+      return;
+    }
+
+    if (variants.length > 0 && (!selectedColor || !selectedSize)) {
+      toast.warning('Vui lòng chọn màu sắc và kích cỡ!');
+      return;
+    }
+
+    let maxQty = product.productStore?.qty || 0;
+    let variantId = null;
+
+    if (variants.length > 0) {
+      const selectedVariant = variants.find(v => v.color === selectedColor && v.size === selectedSize);
+      if (!selectedVariant || selectedVariant.qty <= 0) {
+        toast.warning('Sản phẩm với lựa chọn này đã hết hàng!');
+        return;
+      }
+      maxQty = selectedVariant.qty;
+      variantId = selectedVariant.id;
+    }
+
+    const cartItemId = `${product.id}-${selectedColor || 'default'}-${selectedSize || 'default'}`;
+    const existingItem = cart.find(item => item.cartItemId === cartItemId);
+    const existingQty = existingItem ? existingItem.quantity : 0;
+    
+    if (existingQty + quantity > maxQty) {
+      if (existingQty > 0) {
+        toast.warning(`Giỏ hàng của bạn đã có ${existingQty} sản phẩm loại này. Tồn kho chỉ còn ${maxQty}, không thể thêm ${quantity} nữa!`);
+      } else {
+        toast.warning(`Tồn kho chỉ còn ${maxQty} sản phẩm!`);
+      }
+      return;
+    }
+
+    addToCart({ ...product, selectedColor, selectedSize, variantId }, quantity);
+    toast.success('Đã thêm vào giỏ hàng!');
   };
 
   const toggleWishlist = async () => {
@@ -101,16 +158,28 @@ const ProductDetail = () => {
     }
   };
 
-  const mainImageUrl = product.image 
+  let defaultMainImageUrl = product.image 
     ? (product.image.startsWith('http') ? product.image : `http://localhost:8080/uploads/${product.image}`)
-    : 'https://placehold.co/600x400/f4f7f6/636e72?text=Snack';
+    : 'https://placehold.co/600x400/f4f7f6/636e72?text=Product';
 
-  let gallery = [mainImageUrl];
+  let defaultGallery = [defaultMainImageUrl];
   if (product.gallery) {
     const extraImages = product.gallery.split(',').filter(x => x).map(img => 
       img.startsWith('http') ? img : `http://localhost:8080/uploads/${img}`
     );
-    gallery = [...gallery, ...extraImages];
+    defaultGallery = [...defaultGallery, ...extraImages];
+  }
+
+  let gallery = defaultGallery;
+
+  // If a color is selected and it has its own images, override the gallery completely
+  if (selectedColor && variants.length > 0) {
+    const variantWithImage = variants.find(v => v.color === selectedColor && v.image && v.image.trim() !== '');
+    if (variantWithImage) {
+      gallery = variantWithImage.image.split(',').filter(x => x).map(img => 
+        img.startsWith('http') ? img : `http://localhost:8080/uploads/${img}`
+      );
+    }
   }
 
   const breadcrumbItems = [
@@ -127,40 +196,42 @@ const ProductDetail = () => {
         <div className="detail-grid mt-4">
           {/* Image Section */}
           <div className="detail-image-sec">
-            <div className="main-image-wrapper">
-              <img src={gallery[mainImgIndex]} alt={product.name || product.title} className="main-image" />
-            </div>
             {gallery.length > 1 && (
-              <div className="gallery-thumbs">
+              <div className="gallery-thumbs-vertical">
                 {gallery.map((img, idx) => (
                   <div 
                     key={idx} 
                     className={`thumb-item ${mainImgIndex === idx ? 'active' : ''}`}
                     onClick={() => setMainImgIndex(idx)}
+                    onMouseEnter={() => setMainImgIndex(idx)}
                   >
                     <img src={img} alt={`Gallery ${idx}`} />
                   </div>
                 ))}
               </div>
             )}
+            <div className="main-image-wrapper">
+              <span className="badge-highly-rated">★ Highly Rated</span>
+              <img src={gallery[mainImgIndex]} alt={product.name || product.title} className="main-image" />
+              {gallery.length > 1 && (
+                <>
+                  <button className="img-nav-btn prev" onClick={() => setMainImgIndex(prev => prev === 0 ? gallery.length - 1 : prev - 1)}>&lt;</button>
+                  <button className="img-nav-btn next" onClick={() => setMainImgIndex(prev => prev === gallery.length - 1 ? 0 : prev + 1)}>&gt;</button>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Info Section */}
           <div className="detail-info-sec">
             <h1 className="detail-title">{product.name || product.title}</h1>
+            <div className="detail-category">{product.category?.name || 'Giày thể thao nam'}</div>
             
-            <div className="detail-meta">
-              <span className="detail-category">{product.category?.name || 'SneakerHub'}</span>
-              <span className="detail-status in-stock">Còn hàng</span>
-            </div>
-
             <div className="detail-price">
               {product.productSale?.pricesale ? (
                 <>
-                  <span className="current-price">
-                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.productSale.pricesale)}
-                  </span>
-                  <span className="original-price" style={{textDecoration: 'line-through', color: '#94a3b8', fontSize: '0.65em', marginLeft: '12px'}}>
+                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.productSale.pricesale)}
+                  <span style={{textDecoration: 'line-through', color: '#94a3b8', fontSize: '0.7em', marginLeft: '12px'}}>
                     {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price || 0)}
                   </span>
                 </>
@@ -169,23 +240,91 @@ const ProductDetail = () => {
               )}
             </div>
 
-            <div className="detail-description">
-              <p>{product.description || 'Chưa có mô tả ngắn gọn cho sản phẩm này.'}</p>
-            </div>
+            {/* Color Variants */}
+            {variants.length > 0 && variants.some(v => v.color && v.color.trim() !== '') && (
+              <div className="variant-section mb-4">
+                <div style={{ marginBottom: '10px', fontSize: '1rem', fontWeight: 600 }}>
+                  Màu sắc: <span style={{ color: '#666', fontWeight: 400 }}>{selectedColor || 'Vui lòng chọn'}</span>
+                </div>
+                <div className="color-variants">
+                  {[...new Set(variants.map(v => v.color))].filter(c => c && c.trim() !== '').map((color, idx) => {
+                    const outOfStock = !variants.some(v => v.color === color && v.qty > 0);
+                    const vImgStr = variants.find(v => v.color === color && v.image && v.image.trim() !== '')?.image;
+                    const firstVImg = vImgStr ? vImgStr.split(',')[0] : null;
+                    const thumbSrc = firstVImg 
+                      ? (firstVImg.startsWith('http') ? firstVImg : `http://localhost:8080/uploads/${firstVImg}`) 
+                      : defaultGallery[0];
+
+                    return (
+                      <div 
+                        key={`color-${idx}`} 
+                        className={`color-item ${selectedColor === color ? 'active' : ''} ${outOfStock ? 'out-of-stock' : ''}`} 
+                        title={color}
+                        onClick={() => {
+                          if (!outOfStock) {
+                            setSelectedColor(color);
+                            setMainImgIndex(0); // Reset to show variant image
+                            const firstAvailableSize = variants.find(v => v.color === color && v.qty > 0 && v.size && v.size.trim() !== '')?.size;
+                            if (firstAvailableSize) setSelectedSize(firstAvailableSize);
+                            else setSelectedSize(''); // Reset if no valid size
+                          }
+                        }}
+                      >
+                        <img src={thumbSrc} alt={color} />
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Size Selector */}
+            {variants.length > 0 && variants.some(v => v.color === selectedColor && v.size && v.size.trim() !== '') && (
+              <div className="variant-section mb-4">
+                <div className="size-selector-header">
+                  <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>Kích cỡ: <span style={{ color: '#666', fontWeight: 400 }}>{selectedSize || 'Vui lòng chọn'}</span></h3>
+                  <button className="size-guide-btn">📏 Hướng dẫn chọn size</button>
+                </div>
+                <div className="sizes-grid">
+                  {variants.filter(v => v.color === selectedColor && v.size && v.size.trim() !== '').map((v) => (
+                    <button 
+                      key={v.size} 
+                      className={`size-btn ${selectedSize === v.size ? 'active' : ''}`}
+                      disabled={v.qty <= 0}
+                      onClick={() => setSelectedSize(v.size)}
+                      title={v.qty > 0 ? `Còn ${v.qty} sản phẩm` : 'Hết hàng'}
+                    >
+                      {v.size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="detail-actions">
               <div className="quantity-selector">
                 <button onClick={() => setQuantity(q => Math.max(1, q - 1))}><Minus size={18}/></button>
                 <input type="number" value={quantity} readOnly />
-                <button onClick={() => setQuantity(q => q + 1)}><Plus size={18}/></button>
+                <button onClick={() => {
+                  let maxQty = product.productStore?.qty || 0;
+                  if (variants.length > 0) {
+                    const sv = variants.find(v => v.color === selectedColor && v.size === selectedSize);
+                    if (sv) maxQty = sv.qty;
+                  }
+                  setQuantity(q => (q < maxQty ? q + 1 : q));
+                }}><Plus size={18}/></button>
               </div>
 
-              <button className="btn-add-cart" onClick={handleAddToCart}>
-                <ShoppingCart size={20} /> Thêm Vào Giỏ Hàng
+              <button 
+                className="btn-add-cart" 
+                onClick={handleAddToCart}
+                disabled={variants.length > 0 ? !variants.some(v=>v.color===selectedColor && v.size===selectedSize && v.qty>0) : (!product.productStore?.qty || product.productStore.qty === 0)}
+              >
+                {(variants.length > 0 ? !variants.some(v=>v.color===selectedColor && v.size===selectedSize && v.qty>0) : (!product.productStore?.qty || product.productStore.qty === 0)) ? 'Hết hàng' : 'Thêm vào giỏ'}
               </button>
               
-              <button className="btn-icon-large" onClick={toggleWishlist} style={{ color: isWishlisted ? '#ef4444' : undefined }}>
-                <Heart size={24} fill={isWishlisted ? '#ef4444' : 'none'} />
+              <button className="btn-favorite" onClick={toggleWishlist}>
+                Yêu thích <Heart size={20} fill={isWishlisted ? '#ef4444' : 'none'} color={isWishlisted ? '#ef4444' : 'currentColor'} />
               </button>
             </div>
             
@@ -201,20 +340,11 @@ const ProductDetail = () => {
         <div className="detail-tabs-section">
           <div className="tab-headers">
             <button className={`tab-btn ${activeTab === 'desc' ? 'active' : ''}`} onClick={() => setActiveTab('desc')}>Mô tả sản phẩm</button>
-            <button className={`tab-btn ${activeTab === 'ingredients' ? 'active' : ''}`} onClick={() => setActiveTab('ingredients')}>Thành phần & Bảo quản</button>
             <button className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`} onClick={() => setActiveTab('reviews')}>Đánh giá ({reviews.length})</button>
           </div>
           <div className="tab-content">
             {activeTab === 'desc' && (
               <div className="html-content" dangerouslySetInnerHTML={{ __html: product.detail || '<p>Đang cập nhật chi tiết sản phẩm.</p>' }} />
-            )}
-            {activeTab === 'ingredients' && (
-              <div className="text-content">
-                <p><strong>Thành phần chính:</strong> {product.ingredients || 'Đang cập nhật'}</p>
-                <p><strong>Trọng lượng/Thể tích:</strong> {product.weight || 'Đang cập nhật'}</p>
-                <p><strong>Hướng dẫn bảo quản:</strong> Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp. Đậy kín sau khi sử dụng.</p>
-                <p><strong>Hạn sử dụng:</strong> 6 tháng kể từ ngày sản xuất.</p>
-              </div>
             )}
             {activeTab === 'reviews' && (
               <div className="text-content">
@@ -246,7 +376,7 @@ const ProductDetail = () => {
         {relatedProducts.length > 0 && (
           <div className="related-section">
             <div className="section-header">
-              <h2>Sản Phẩm Cùng Danh Mục</h2>
+              <h2>Có Thể Bạn Cũng Thích</h2>
             </div>
             <div className="product-grid">
               {relatedProducts.map(p => (

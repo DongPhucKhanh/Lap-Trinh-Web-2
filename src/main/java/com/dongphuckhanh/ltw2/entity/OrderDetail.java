@@ -33,6 +33,14 @@ public class OrderDetail {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    /** Biến thể Màu sắc (Lưu tại thời điểm mua) */
+    @Column(name = "variant_color", length = 100)
+    private String variantColor;
+
+    /** Biến thể Kích cỡ (Lưu tại thời điểm mua) */
+    @Column(name = "variant_size", length = 50)
+    private String variantSize;
+
     /** Giá tại thời điểm đặt hàng (snapshot) */
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal price;

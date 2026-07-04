@@ -15,14 +15,29 @@ const [formData, setFormData] = useState({
     name: '',
     slug: '',
     description: '',
+    parentId: '', // Added for multi-level
     status: 1
   });
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     categoryService.getById(id)
       .then(res => {
-        setFormData(res.data);
+        setFormData({
+          ...res.data,
+          parentId: res.data.parentId || ''
+        });
         if (res.data.image) setImagePreview(uploadService.getImageUrl(res.data.image));
+        
+        // Fetch all categories for the dropdown
+        return categoryService.getAll();
+      })
+      .then(resCats => {
+        const allCats = resCats.data || [];
+        if (allCats) {
+          // Exclude the current category to prevent selecting itself as parent
+          setCategories(allCats.filter(c => c.id.toString() !== id));
+        }
         setInitialLoading(false);
       })
       .catch(err => {
@@ -58,7 +73,11 @@ const [formData, setFormData] = useState({
           const uploadRes = await uploadService.uploadImage(imageFile);
           finalImage = uploadRes.filename;
         }
-        const payload = { ...formData, image: finalImage };
+        const payload = { 
+          ...formData, 
+          image: finalImage,
+          parentId: formData.parentId ? parseInt(formData.parentId) : null
+        };
         
         await categoryService.update(id, payload);
         setLoading(false);
@@ -103,6 +122,19 @@ const [formData, setFormData] = useState({
               <option value={1}>Hoạt động</option>
               <option value={0}>Ẩn</option>
             </select>
+          </div>
+
+          <div className="form-group">
+            <label>Danh mục cha (Cấp trên)</label>
+            <select value={formData.parentId || ''} onChange={e => setFormData({...formData, parentId: e.target.value})}>
+              <option value="">-- Không có (Danh mục gốc) --</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+            <small style={{display: 'block', marginTop: '5px', color: '#666'}}>
+              Chọn danh mục cha nếu bạn muốn danh mục này nằm bên trong danh mục khác.
+            </small>
           </div>
 
           

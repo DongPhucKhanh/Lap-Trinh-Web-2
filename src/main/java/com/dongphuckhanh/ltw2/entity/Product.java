@@ -5,6 +5,7 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Entity ánh xạ bảng 'product'.
@@ -92,6 +93,11 @@ public class Product {
     @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     @com.fasterxml.jackson.annotation.JsonIgnore
     private List<OrderDetail> orderDetails;
+
+    /** Danh sách biến thể (màu sắc, kích cỡ) */
+    @JsonIgnore
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ProductVariant> variants;
 
     @PrePersist
     protected void onCreate() {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, Users, Settings, LogOut, Tag, Bookmark, FileText, ShoppingCart, MessageSquare, Image, Menu } from 'lucide-react';
+import { LayoutDashboard, Package, Users, Settings, LogOut, Tag, Bookmark, FileText, ShoppingCart, MessageSquare, Image, Menu, Box } from 'lucide-react';
 import orderService from '../services/orderService';
 
 const Sidebar = () => {
@@ -47,6 +47,7 @@ const Sidebar = () => {
   const navItems = [
     { path: '/admin', icon: <LayoutDashboard size={20} />, label: 'Dashboard' },
     { path: '/admin/product', icon: <Package size={20} />, label: 'Sản Phẩm' },
+    { path: '/admin/inventory', icon: <Box size={20} />, label: 'Quản Lý Kho' },
     { path: '/admin/category', icon: <Bookmark size={20} />, label: 'Danh Mục' },
     { path: '/admin/brand', icon: <Tag size={20} />, label: 'Thương Hiệu' },
     { path: '/admin/order', icon: <ShoppingCart size={20} />, label: 'Đơn Hàng' },

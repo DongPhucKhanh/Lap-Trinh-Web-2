@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Package, ArrowLeft, Save, X } from 'lucide-react';
+import { Package, ArrowLeft, Save, X, Plus, Trash2, Image as ImageIcon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import categoryService from '../../services/categoryService';
@@ -43,6 +43,14 @@ const ProductCreate = () => {
     dateEnd: ''
   });
 
+  // Variant Matrix States
+  const [colors, setColors] = useState([]); // [{ name: 'Đen', files: [], previews: [] }]
+  const [sizes, setSizes] = useState([]); // ['39', '40']
+  const [variantMatrix, setVariantMatrix] = useState({}); // {'Đen-39': 10}
+  
+  const [tempColor, setTempColor] = useState('');
+  const [tempSize, setTempSize] = useState('');
+
   useEffect(() => {
     categoryService.getAll().then(res => setCategories(res.data));
     brandService.getAll().then(res => setBrands(res.data));
@@ -77,6 +85,103 @@ const ProductCreate = () => {
   const removeGalleryImage = (index) => {
     setGalleryFiles(prev => prev.filter((_, i) => i !== index));
     setGalleryPreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Matrix Handlers
+  const handleAddColor = () => {
+    if (!tempColor.trim()) return;
+    if (colors.find(c => c.name === tempColor.trim())) {
+      alert('Màu này đã tồn tại!'); return;
+    }
+    setColors([...colors, { name: tempColor.trim(), files: [], previews: [] }]);
+    setTempColor('');
+  };
+
+  const handleRemoveColor = (colorName) => {
+    setColors(colors.filter(c => c.name !== colorName));
+    const newMatrix = { ...variantMatrix };
+    Object.keys(newMatrix).forEach(k => {
+      if (k.startsWith(colorName + '-')) delete newMatrix[k];
+    });
+    setVariantMatrix(newMatrix);
+  };
+
+  const handleAddSize = () => {
+    if (!tempSize.trim()) return;
+    
+    // Tách các size bằng dấu phẩy
+    const inputSizes = tempSize.split(',').map(s => s.trim()).filter(s => s !== '');
+    const newSizes = [];
+    let hasDuplicate = false;
+    
+    inputSizes.forEach(s => {
+      if (!sizes.includes(s) && !newSizes.includes(s)) {
+        newSizes.push(s);
+      } else {
+        hasDuplicate = true;
+      }
+    });
+
+    if (newSizes.length > 0) {
+      setSizes([...sizes, ...newSizes]);
+    } else if (hasDuplicate && inputSizes.length === 1) {
+      alert('Size này đã tồn tại!');
+    }
+    
+    setTempSize('');
+  };
+
+  const handleRemoveSize = (sizeName) => {
+    setSizes(sizes.filter(s => s !== sizeName));
+    const newMatrix = { ...variantMatrix };
+    Object.keys(newMatrix).forEach(k => {
+      if (k.endsWith('-' + sizeName)) delete newMatrix[k];
+    });
+    setVariantMatrix(newMatrix);
+  };
+
+  const handleColorImageChange = (colorName, e) => {
+    const files = Array.from(e.target.files);
+    const previews = files.map(f => URL.createObjectURL(f));
+    
+    setColors(colors.map(c => {
+      if (c.name === colorName) {
+        return { ...c, files: [...c.files, ...files], previews: [...c.previews, ...previews] };
+      }
+      return c;
+    }));
+  };
+
+  const removeColorImage = (colorName, imgIndex) => {
+    setColors(colors.map(c => {
+      if (c.name === colorName) {
+        const newFiles = c.files.filter((_, i) => i !== imgIndex);
+        const newPreviews = c.previews.filter((_, i) => i !== imgIndex);
+        return { ...c, files: newFiles, previews: newPreviews };
+      }
+      return c;
+    }));
+  };
+
+  const handleMatrixChange = (color, size, val) => {
+    setVariantMatrix({
+      ...variantMatrix,
+      [`${color}-${size}`]: val
+    });
+  };
+
+  const handleBulkMatrix = () => {
+    const bulkVal = prompt("Nhập số lượng áp dụng cho tất cả phân loại:");
+    if (bulkVal !== null && !isNaN(bulkVal)) {
+      const newMatrix = { ...variantMatrix };
+      const sizesToLoop = sizes.length > 0 ? sizes : [''];
+      colors.forEach(c => {
+        sizesToLoop.forEach(s => {
+          newMatrix[`${c.name}-${s}`] = parseInt(bulkVal, 10);
+        });
+      });
+      setVariantMatrix(newMatrix);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -124,7 +229,35 @@ const ProductCreate = () => {
         };
       }
 
-      await api.post('/products', payload);
+      const res = await api.post('/products', payload);
+      const createdProductId = res.data.id;
+
+      // Create variants matrix
+      if (colors.length > 0 && createdProductId) {
+        const colorImagesMap = {};
+        for (const c of colors) {
+          const uploadedNames = [];
+          for (const f of c.files) {
+            const upRes = await uploadService.uploadImage(f);
+            uploadedNames.push(upRes.filename);
+          }
+          colorImagesMap[c.name] = uploadedNames.join(',');
+        }
+
+        const sizesToLoop = sizes.length > 0 ? sizes : [''];
+        for (const c of colors) {
+          for (const s of sizesToLoop) {
+            const qty = parseInt(variantMatrix[`${c.name}-${s}`] || 0, 10);
+            await api.post(`/product-variants/product/${createdProductId}`, {
+              color: c.name,
+              size: s,
+              qty: qty,
+              image: colorImagesMap[c.name]
+            });
+          }
+        }
+      }
+
       setLoading(false);
       navigate('/admin/product');
     } catch (err) {
@@ -235,7 +368,115 @@ const ProductCreate = () => {
             <ReactQuill theme="snow" value={formData.detail} onChange={val => setFormData({...formData, detail: val})} style={{height: '250px', marginBottom: '50px'}} />
           </div>
 
-          <h3 style={{borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '20px', marginTop: '40px', color: 'var(--primary)'}}>2. Kho hàng & Khuyến mãi</h3>
+          <h3 style={{borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '20px', marginTop: '40px', color: 'var(--primary)'}}>2. Quản lý Biến thể (Màu sắc & Kích cỡ)</h3>
+          
+          {/* MATRIX UI */}
+          <div style={{ backgroundColor: '#f8fafc', padding: '20px', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '30px' }}>
+            
+            {/* Nhóm phân loại 1: Màu sắc */}
+            <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: 'white', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
+              <h4 style={{ margin: '0 0 10px 0' }}>Nhóm phân loại 1: Màu sắc</h4>
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                <input 
+                  type="text" placeholder="Thêm màu sắc (VD: Trắng, Đen)" value={tempColor} 
+                  onChange={e => setTempColor(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddColor())}
+                  style={{ flex: 1, maxWidth: '300px', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+                />
+                <button type="button" onClick={handleAddColor} className="btn-secondary" style={{ padding: '8px 15px' }}>Thêm màu</button>
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                {colors.map((c, idx) => (
+                  <div key={idx} style={{ padding: '15px', border: '1px solid #e2e8f0', borderRadius: '8px', position: 'relative' }}>
+                    <button type="button" onClick={() => handleRemoveColor(c.name)} style={{ position: 'absolute', top: '10px', right: '10px', background: 'transparent', border: 'none', color: 'red', cursor: 'pointer' }}><Trash2 size={18}/></button>
+                    <h5 style={{ margin: '0 0 10px 0', fontSize: '1rem' }}>Màu: <span style={{ color: 'var(--primary)' }}>{c.name}</span></h5>
+                    
+                    <label style={{ cursor: 'pointer', padding: '6px 12px', border: '1px solid #ccc', borderRadius: '4px', display: 'inline-flex', alignItems: 'center', gap: '5px', backgroundColor: '#f1f5f9', fontSize: '0.9rem' }}>
+                      <ImageIcon size={14} /> Thêm ảnh cho màu này
+                      <input type="file" accept="image/*" multiple onChange={(e) => handleColorImageChange(c.name, e)} style={{ display: 'none' }} />
+                    </label>
+                    
+                    {c.previews.length > 0 && (
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '10px' }}>
+                        {c.previews.map((src, imgIdx) => (
+                          <div key={imgIdx} style={{position: 'relative', width: '80px', height: '80px'}}>
+                            <img src={src} alt="Color Gallery" style={{width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px', border: '1px solid #cbd5e1'}} />
+                            <button type="button" onClick={() => removeColorImage(c.name, imgIdx)} style={{position: 'absolute', top: '-5px', right: '-5px', background: 'red', color: 'white', border: 'none', borderRadius: '50%', width: '20px', height: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                              <X size={12}/>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Nhóm phân loại 2: Kích cỡ */}
+            <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: 'white', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
+              <h4 style={{ margin: '0 0 10px 0' }}>Nhóm phân loại 2: Kích cỡ (Tùy chọn)</h4>
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                <input 
+                  type="text" placeholder="Thêm size (VD: 39, 40, S, M)" value={tempSize} 
+                  onChange={e => setTempSize(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddSize())}
+                  style={{ flex: 1, maxWidth: '300px', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+                />
+                <button type="button" onClick={handleAddSize} className="btn-secondary" style={{ padding: '8px 15px' }}>Thêm size</button>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                {sizes.map((s, idx) => (
+                  <div key={idx} style={{ padding: '5px 10px', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {s}
+                    <X size={14} style={{ cursor: 'pointer', color: 'red' }} onClick={() => handleRemoveSize(s)} />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Matrix Table */}
+            {(colors.length > 0 || sizes.length > 0) && (
+              <div style={{ padding: '15px', backgroundColor: 'white', borderRadius: '8px', border: '1px solid #e2e8f0', overflowX: 'auto' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+                  <h4 style={{ margin: 0 }}>Bảng nhập số lượng</h4>
+                  <button type="button" onClick={handleBulkMatrix} className="btn-secondary" style={{ fontSize: '0.85rem', padding: '5px 10px' }}>Áp dụng hàng loạt</button>
+                </div>
+                <table className="admin-table" style={{ width: '100%', fontSize: '14px', minWidth: '400px' }}>
+                  <thead>
+                    <tr style={{ background: '#f8fafc' }}>
+                      {colors.length > 0 && <th>Màu sắc</th>}
+                      {sizes.length > 0 && <th>Kích cỡ</th>}
+                      <th>Số lượng kho</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(colors.length > 0 ? colors : [{name: ''}]).map(c => {
+                      const sizesToLoop = sizes.length > 0 ? sizes : [''];
+                      return sizesToLoop.map((s, idx) => (
+                        <tr key={`${c.name}-${s}`}>
+                          {colors.length > 0 && idx === 0 && <td rowSpan={sizesToLoop.length} style={{ verticalAlign: 'middle', fontWeight: 'bold' }}>{c.name}</td>}
+                          {sizes.length > 0 && <td>{s}</td>}
+                          <td>
+                            <input 
+                              type="number" min="0" 
+                              value={variantMatrix[`${c.name}-${s}`] || ''} 
+                              onChange={e => handleMatrixChange(c.name, s, e.target.value)}
+                              placeholder="0"
+                              style={{ width: '100px', padding: '5px', border: '1px solid #ccc', borderRadius: '4px' }}
+                            />
+                          </td>
+                        </tr>
+                      ));
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          <h3 style={{borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '20px', marginTop: '40px', color: 'var(--primary)'}}>3. Kho hàng & Khuyến mãi</h3>
           
           <div style={{display: 'flex', gap: '1rem'}}>
             <div className="form-group" style={{flex: 1}}>

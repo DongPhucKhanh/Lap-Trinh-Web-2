@@ -25,6 +25,14 @@ public class CategoryController {
         return ResponseEntity.ok(categoryRepository.findAll());
     }
 
+    // Lấy một danh mục theo ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
+        return categoryRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     // Thêm mới một danh mục
     @PostMapping
     public ResponseEntity<Category> createCategory(@RequestBody Category category) {

@@ -92,6 +92,7 @@ public class SecurityConfig {
                     "/api/banners", "/api/banners/**",
                     "/api/reviews/product/**",
                     "/api/reviews/latest",
+                    "/api/product-variants/**",
                     "/uploads/**",
                     "/error"
                 ).permitAll()

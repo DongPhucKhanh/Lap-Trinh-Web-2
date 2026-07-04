@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bookmark, ArrowLeft, Save } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import uploadService from '../../services/uploadService';
@@ -13,8 +13,23 @@ const [formData, setFormData] = useState({
     name: '',
     slug: '',
     description: '',
+    parentId: '', // For multi-level categories
     status: 1
   });
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    // Fetch all existing categories to use as parent candidates
+    const fetchCategories = async () => {
+      try {
+        const res = await categoryService.getAll();
+        setCategories(res.data || []);
+      } catch (err) {
+        console.error('Failed to load categories for parent selection', err);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const generateSlug = (name) => {
     return name.toLowerCase()
@@ -43,7 +58,11 @@ const [formData, setFormData] = useState({
           const uploadRes = await uploadService.uploadImage(imageFile);
           finalImage = uploadRes.filename;
         }
-        const payload = { ...formData, image: finalImage };
+        const payload = { 
+          ...formData, 
+          image: finalImage,
+          parentId: formData.parentId ? parseInt(formData.parentId) : null
+        };
         
         await categoryService.create(payload);
         setLoading(false);
@@ -86,6 +105,19 @@ const [formData, setFormData] = useState({
               <option value={1}>Hoạt động</option>
               <option value={0}>Ẩn</option>
             </select>
+          </div>
+
+          <div className="form-group">
+            <label>Danh mục cha (Cấp trên)</label>
+            <select value={formData.parentId} onChange={e => setFormData({...formData, parentId: e.target.value})}>
+              <option value="">-- Không có (Danh mục gốc) --</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+            <small style={{display: 'block', marginTop: '5px', color: '#666'}}>
+              Chọn danh mục cha nếu bạn muốn danh mục này nằm bên trong danh mục khác.
+            </small>
           </div>
 
           

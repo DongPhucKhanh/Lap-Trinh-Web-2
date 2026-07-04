@@ -24,7 +24,20 @@ const OrderList = () => {
     }).catch(err => { console.error(err); setLoading(false); });
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { 
+    fetchData(); 
+    
+    // Short Polling: Cứ 3 giây gọi ngầm API lấy dữ liệu 1 lần mà không hiện loading
+    const intervalId = setInterval(() => {
+      orderService.getAll().then(res => { 
+        const sorted = res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setData(sorted); 
+      }).catch(err => console.error("Polling error:", err));
+    }, 3000);
+
+    // Dọn dẹp bộ đếm khi rời khỏi trang
+    return () => clearInterval(intervalId);
+  }, []);
 
   const handleDelete = (id) => {
     if (window.confirm('Bạn có chắc chắn muốn xoá đơn hàng này?')) {

@@ -12,6 +12,9 @@ import ProductEdit from '../pages/Product/ProductEdit';
 import ProductTrash from '../pages/Product/ProductTrash';
 import ProductDetail from '../pages/Product/ProductDetail';
 
+// Inventory
+import Inventory from '../pages/Inventory/Inventory';
+
 // Category
 import CategoryList from '../pages/Category/CategoryList';
 import CategoryCreate from '../pages/Category/CategoryCreate';
@@ -85,6 +88,8 @@ const AdminRoutes = () => {
           <Route path="trash" element={<ProductTrash />} />
           <Route path="detail/:id" element={<ProductDetail />} />
         </Route>
+
+        <Route path="inventory" element={<Inventory />} />
 
         <Route path="category">
           <Route index element={<CategoryList />} />

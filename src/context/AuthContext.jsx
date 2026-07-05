@@ -47,6 +47,8 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setToken(null);
     setUser(null);
+    localStorage.removeItem('snackhub_cart');
+    window.dispatchEvent(new Event('auth_logout'));
   };
 
   return (

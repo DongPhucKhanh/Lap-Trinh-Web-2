@@ -6,6 +6,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
 import './ProductCard.css';
+import QuickViewModal from './QuickViewModal';
 
 const ProductCard = ({ product, layout = 'grid', isFavorite, onToggleFavorite, onQuickView }) => {
   const { addToCart, cart } = useContext(CartContext);
@@ -13,6 +14,7 @@ const ProductCard = ({ product, layout = 'grid', isFavorite, onToggleFavorite, o
   const navigate = useNavigate();
   const [variants, setVariants] = useState([]);
   const [activeColorIdx, setActiveColorIdx] = useState(-1);
+  const [showInternalQuickView, setShowInternalQuickView] = useState(false);
 
   useEffect(() => {
     if (product && product.id) {
@@ -29,7 +31,19 @@ const ProductCard = ({ product, layout = 'grid', isFavorite, onToggleFavorite, o
       navigate('/login');
       return;
     }
-    const existingItem = cart.find(item => item.id === product.id);
+
+    // Nếu sản phẩm có biến thể, hiển thị modal chọn biến thể (bảng chọn màu/size)
+    if (variants.length > 0) {
+      if (onQuickView) {
+        onQuickView(product);
+      } else {
+        setShowInternalQuickView(true);
+      }
+      return;
+    }
+
+    const cartItemId = `${product.id}-default-default`;
+    const existingItem = cart.find(item => item.cartItemId === cartItemId);
     const existingQty = existingItem ? existingItem.quantity : 0;
     const maxQty = product.productStore?.qty || 0;
     
@@ -109,7 +123,11 @@ const ProductCard = ({ product, layout = 'grid', isFavorite, onToggleFavorite, o
           
           <button 
             className="action-btn"
-            onClick={(e) => { e.preventDefault(); onQuickView && onQuickView(product); }}
+            onClick={(e) => { 
+              e.preventDefault(); 
+              if (onQuickView) onQuickView(product); 
+              else setShowInternalQuickView(true);
+            }}
             title="Xem nhanh"
           >
             <Eye size={18} />
@@ -178,6 +196,12 @@ const ProductCard = ({ product, layout = 'grid', isFavorite, onToggleFavorite, o
           </button>
         )}
       </div>
+      {showInternalQuickView && (
+        <QuickViewModal 
+          product={product} 
+          onClose={() => setShowInternalQuickView(false)} 
+        />
+      )}
     </div>
   );
 };

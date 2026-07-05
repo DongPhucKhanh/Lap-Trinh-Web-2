@@ -14,6 +14,13 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('snackhub_cart', JSON.stringify(cart));
   }, [cart]);
 
+  // Listen for logout events to clear the cart
+  useEffect(() => {
+    const handleLogout = () => clearCart();
+    window.addEventListener('auth_logout', handleLogout);
+    return () => window.removeEventListener('auth_logout', handleLogout);
+  }, []);
+
   // Actions
   const addToCart = (product, quantity = 1) => {
     setCart(prevCart => {

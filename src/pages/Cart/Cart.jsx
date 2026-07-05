@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CartContext } from '../../context/CartContext';
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from 'lucide-react';
@@ -6,8 +6,39 @@ import { toast } from 'react-toastify';
 import './Cart.css';
 
 const Cart = () => {
-  const { cart, removeFromCart, updateQuantity, clearCart, cartTotal } = useContext(CartContext);
+  const { cart, removeFromCart, updateQuantity, clearCart } = useContext(CartContext);
   const navigate = useNavigate();
+
+  const [selectedItems, setSelectedItems] = useState([]);
+
+  // Default to selecting all items when cart loads or changes
+  useEffect(() => {
+    setSelectedItems(cart.map(item => item.cartItemId));
+  }, [cart]);
+
+  const toggleItemSelection = (cartItemId) => {
+    setSelectedItems(prev => 
+      prev.includes(cartItemId) 
+        ? prev.filter(id => id !== cartItemId)
+        : [...prev, cartItemId]
+    );
+  };
+
+  const toggleAllSelection = () => {
+    if (selectedItems.length === cart.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(cart.map(item => item.cartItemId));
+    }
+  };
+
+  const selectedTotal = cart.reduce((total, item) => {
+    if (selectedItems.includes(item.cartItemId)) {
+      const price = item.productSale?.pricesale || item.price || 0;
+      return total + (price * item.quantity);
+    }
+    return total;
+  }, 0);
 
   if (cart.length === 0) {
     return (
@@ -25,7 +56,15 @@ const Cart = () => {
   return (
     <div className="cart-container">
       <div className="cart-header">
-        <h1>Giỏ Hàng Của Bạn</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <input 
+            type="checkbox" 
+            checked={selectedItems.length === cart.length && cart.length > 0} 
+            onChange={toggleAllSelection}
+            style={{ width: '20px', height: '20px', accentColor: '#ff6b6b', cursor: 'pointer' }}
+          />
+          <h1 style={{ margin: 0 }}>Giỏ Hàng Của Bạn</h1>
+        </div>
         <button className="btn-outline-danger" onClick={clearCart}>Xóa tất cả</button>
       </div>
 
@@ -33,6 +72,14 @@ const Cart = () => {
         <div className="cart-items">
           {cart.map(item => (
             <div key={item.cartItemId} className="cart-item">
+              <div style={{ display: 'flex', alignItems: 'center', padding: '0 10px' }}>
+                <input 
+                  type="checkbox" 
+                  checked={selectedItems.includes(item.cartItemId)}
+                  onChange={() => toggleItemSelection(item.cartItemId)}
+                  style={{ width: '20px', height: '20px', accentColor: '#ff6b6b', cursor: 'pointer' }}
+                />
+              </div>
               <div className="cart-item-img">
                 <img src={item.image ? (item.image.startsWith('http') ? item.image : `http://localhost:8080/uploads/${item.image}`) : 'https://placehold.co/100x100/f4f7f6/636e72'} alt={item.name} />
               </div>
@@ -78,8 +125,8 @@ const Cart = () => {
         <div className="cart-summary">
           <h2>Tổng Đơn Hàng</h2>
           <div className="summary-row">
-            <span>Tạm tính:</span>
-            <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(cartTotal)}</span>
+            <span>Tạm tính ({selectedItems.length} sản phẩm):</span>
+            <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedTotal)}</span>
           </div>
           <div className="summary-row">
             <span>Phí giao hàng:</span>
@@ -88,9 +135,20 @@ const Cart = () => {
           <div className="summary-divider"></div>
           <div className="summary-row total">
             <span>Tổng cộng:</span>
-            <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(cartTotal)}</span>
+            <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedTotal)}</span>
           </div>
-          <button className="btn-checkout" onClick={() => navigate('/checkout')}>
+          <button 
+            className="btn-checkout" 
+            onClick={() => {
+              if (selectedItems.length === 0) {
+                toast.warning('Vui lòng chọn ít nhất một sản phẩm để thanh toán!');
+                return;
+              }
+              navigate('/checkout', { state: { selectedItems } });
+            }}
+            disabled={selectedItems.length === 0}
+            style={{ opacity: selectedItems.length === 0 ? 0.5 : 1, cursor: selectedItems.length === 0 ? 'not-allowed' : 'pointer' }}
+          >
             Tiến Hành Thanh Toán
           </button>
           <Link to="/" className="continue-shopping">

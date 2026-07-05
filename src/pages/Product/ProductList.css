@@ -105,8 +105,26 @@
 
 .category-list li.active {
   background: var(--primary);
-  color: white;
+  color: white !important;
   font-weight: 500;
+}
+
+.category-list li.parent-category {
+  font-weight: 700;
+  color: #111;
+  margin-top: 5px;
+}
+
+.category-list li.child-category {
+  padding-left: 2rem;
+  font-size: 0.95rem;
+  position: relative;
+}
+.category-list li.child-category::before {
+  content: "•";
+  position: absolute;
+  left: 1rem;
+  color: #ccc;
 }
 
 .sort-select {
@@ -193,4 +211,10 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+}
+
+/* Make grid mode in Product List 2 columns */
+.product-list-page .product-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
 }

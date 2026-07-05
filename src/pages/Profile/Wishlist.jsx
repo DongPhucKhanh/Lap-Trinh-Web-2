@@ -55,35 +55,95 @@ const Wishlist = () => {
       ) : (
         <div className="wishlist-grid">
           {favorites.map(product => (
-            <div key={product.id} className="wishlist-card">
-              <Link to={`/product/${product.id}`} className="wishlist-img-wrapper">
-                <img 
-                  src={product.image ? (product.image.startsWith('http') ? product.image : `http://localhost:8080/uploads/${product.image}`) : 'https://placehold.co/400'} 
-                  alt={product.name} 
-                  className="wishlist-img"
-                />
-              </Link>
-              <div className="wishlist-info">
-                <Link to={`/product/${product.id}`} className="wishlist-title">
-                  {product.name}
-                </Link>
-                <div className="wishlist-price">
-                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}
-                </div>
-                <div className="wishlist-actions">
-                  <button 
-                    className="btn-icon text-red" 
-                    title="Xóa khỏi danh sách"
-                    onClick={() => removeFavorite(product.id)}
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              </div>
-            </div>
+            <WishlistCard 
+              key={product.id} 
+              product={product} 
+              onRemove={() => removeFavorite(product.id)} 
+            />
           ))}
         </div>
       )}
+    </div>
+  );
+};
+
+// Sub-component to manage state for each wishlist item
+const WishlistCard = ({ product, onRemove }) => {
+  const [variants, setVariants] = React.useState([]);
+  const [activeColorIdx, setActiveColorIdx] = React.useState(-1);
+
+  React.useEffect(() => {
+    if (product && product.id) {
+      api.get(`/product-variants/product/${product.id}`)
+        .then(res => setVariants(res.data || []))
+        .catch(err => console.error(err));
+    }
+  }, [product?.id]);
+
+  // Compute unique color variants with their images
+  const colorVariants = [];
+  if (variants && variants.length > 0) {
+    const uniqueColors = [...new Set(variants.map(v => v.color))].filter(c => c && c.trim() !== '');
+    uniqueColors.forEach(color => {
+      const vImgStr = variants.find(v => v.color === color && v.image && v.image.trim() !== '')?.image;
+      if (vImgStr) {
+        colorVariants.push({ color, image: vImgStr.split(',')[0] });
+      }
+    });
+  }
+
+  // Get current main image based on active color
+  const defaultImage = product.image ? (product.image.startsWith('http') ? product.image : `http://localhost:8080/uploads/${product.image}`) : 'https://placehold.co/400';
+  const displayImage = colorVariants.length > 0 && colorVariants[activeColorIdx]
+    ? (colorVariants[activeColorIdx].image.startsWith('http') ? colorVariants[activeColorIdx].image : `http://localhost:8080/uploads/${colorVariants[activeColorIdx].image}`)
+    : defaultImage;
+
+  return (
+    <div className="wishlist-card">
+      <Link to={`/product/${product.id}`} className="wishlist-img-wrapper">
+        <img 
+          src={displayImage} 
+          alt={product.name} 
+          className="wishlist-img"
+        />
+      </Link>
+      <div className="wishlist-info">
+        {/* Real Color Variant Thumbnails */}
+        {colorVariants.length > 1 && (
+          <div className="product-card-colors" style={{ marginBottom: '10px' }}>
+            {colorVariants.map((cv, idx) => {
+              const thumbSrc = cv.image.startsWith('http') ? cv.image : `http://localhost:8080/uploads/${cv.image}`;
+              return (
+                <img 
+                  key={idx}
+                  src={thumbSrc} 
+                  alt={cv.color}
+                  title={cv.color}
+                  className={activeColorIdx === idx ? 'active' : ''}
+                  onMouseEnter={() => setActiveColorIdx(idx)}
+                  onError={(e) => { e.target.style.display = 'none' }}
+                  style={{ width: '32px', height: '32px', borderRadius: '4px', objectFit: 'cover', border: activeColorIdx === idx ? '1.5px solid #111' : '1px solid #e5e5e5', marginRight: '6px', cursor: 'pointer' }}
+                />
+              );
+            })}
+          </div>
+        )}
+        <Link to={`/product/${product.id}`} className="wishlist-title">
+          {product.name}
+        </Link>
+        <div className="wishlist-price">
+          {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}
+        </div>
+        <div className="wishlist-actions">
+          <button 
+            className="btn-icon text-red" 
+            title="Xóa khỏi danh sách"
+            onClick={onRemove}
+          >
+            <Trash2 size={18} />
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

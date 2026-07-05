@@ -21,6 +21,25 @@ const Profile = () => {
     avatar: ''
   });
 
+  const [addresses, setAddresses] = useState([]);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [newAddress, setNewAddress] = useState({
+    receiverName: '',
+    phone: '',
+    addressLine: '',
+    isDefault: false
+  });
+
+  const fetchAddresses = async () => {
+    if (!user) return;
+    try {
+      const res = await api.get(`/user-addresses/user/${user.id}`);
+      setAddresses(res.data || []);
+    } catch (err) {
+      console.error("Error fetching addresses:", err);
+    }
+  };
+
   useEffect(() => {
     if (user) {
       setFormData({
@@ -34,6 +53,7 @@ const Profile = () => {
       if (user.avatar) {
         setAvatarUrl(user.avatar.startsWith('http') ? user.avatar : `http://localhost:8080/uploads/${user.avatar}`);
       }
+      fetchAddresses();
     }
   }, [user]);
 
@@ -73,6 +93,43 @@ const Profile = () => {
     }
   };
 
+  const handleAddAddress = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post('/user-addresses', {
+        ...newAddress,
+        user: { id: user.id }
+      });
+      toast.success('Thêm địa chỉ thành công!');
+      setShowAddressModal(false);
+      setNewAddress({ receiverName: '', phone: '', addressLine: '', isDefault: false });
+      fetchAddresses();
+    } catch (err) {
+      toast.error('Lỗi khi thêm địa chỉ');
+    }
+  };
+
+  const handleSetDefaultAddress = async (id) => {
+    try {
+      await api.put(`/user-addresses/${id}/default`);
+      toast.success('Đã thiết lập địa chỉ mặc định!');
+      fetchAddresses();
+    } catch (err) {
+      toast.error('Lỗi khi thiết lập mặc định');
+    }
+  };
+
+  const handleDeleteAddress = async (id) => {
+    if (!window.confirm("Bạn có chắc muốn xoá địa chỉ này?")) return;
+    try {
+      await api.delete(`/user-addresses/${id}`);
+      toast.success('Đã xoá địa chỉ!');
+      fetchAddresses();
+    } catch (err) {
+      toast.error('Lỗi khi xoá địa chỉ');
+    }
+  };
+
   const handleAvatarUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -102,9 +159,23 @@ const Profile = () => {
       const filename = uploadRes.data.filename;
       setAvatarUrl(`http://localhost:8080/uploads/${filename}`);
       setFormData(prev => ({ ...prev, avatar: filename }));
-      toast.success('Tải ảnh đại diện thành công!');
-    } catch (err) {
-      console.error(err);
+      
+      // Tự động lưu avatar vào database luôn không cần bấm Lưu thay đổi
+      const updatedPayload = {
+        ...user,
+        name: formData.name || user.name,
+        email: formData.email || user.email,
+        phone: formData.phone || user.phone,
+        address: formData.address || user.address,
+        gender: formData.gender || user.gender,
+        avatar: filename
+      };
+      const res = await api.put(`/users/${user.id}`, updatedPayload);
+      setUser(res.data);
+      
+      toast.success('Cập nhật ảnh đại diện thành công!');
+    } catch (error) {
+      console.error(error);
       toast.error('Có lỗi xảy ra khi tải ảnh!');
     }
   };
@@ -169,7 +240,7 @@ const Profile = () => {
             <label>Giới tính</label>
             <div className="info-value">
               {isEditing ? (
-                <select name="gender" value={formData.gender} onChange={handleChange} className="profile-input" style={{width: '150px'}}>
+                <select name="gender" value={formData.gender} onChange={handleChange} className="profile-input">
                   <option value="male">Nam</option>
                   <option value="female">Nữ</option>
                   <option value="other">Khác</option>

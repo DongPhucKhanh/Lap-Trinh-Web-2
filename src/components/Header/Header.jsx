@@ -15,6 +15,9 @@ const Header = () => {
   const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -36,6 +39,26 @@ const Header = () => {
   }, [isDarkMode]);
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.trim()) {
+        setIsSearching(true);
+        api.get(`/products/search?keyword=${encodeURIComponent(searchQuery.trim())}&size=5`)
+          .then(res => {
+            setSearchSuggestions(res.data.content || []);
+            setShowSuggestions(true);
+          })
+          .catch(console.error)
+          .finally(() => setIsSearching(false));
+      } else {
+        setSearchSuggestions([]);
+        setShowSuggestions(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
     if (headerRef.current) {
       setHeaderHeight(headerRef.current.offsetHeight);
     }
@@ -48,15 +71,6 @@ const Header = () => {
       // Update scrolled state (to trigger sticky UI)
       setIsScrolled(currentScrollY > 50);
       
-      // Handle hide/show based on scroll direction
-      if (currentScrollY > lastScrollY.current && currentScrollY > 150) {
-        // Scrolling down and past the threshold -> hide
-        setIsHidden(true);
-      } else if (currentScrollY < lastScrollY.current) {
-        // Scrolling up -> show
-        setIsHidden(false);
-      }
-      
       lastScrollY.current = currentScrollY;
     };
     
@@ -66,6 +80,9 @@ const Header = () => {
       }
       if (!e.target.closest('.nav-categories')) {
         setCategoryMenuOpen(false);
+      }
+      if (!e.target.closest('.header-search-wrapper')) {
+        setShowSuggestions(false);
       }
     };
 
@@ -87,14 +104,15 @@ const Header = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      navigate(`/product?search=${encodeURIComponent(searchQuery)}`);
+      setShowSuggestions(false);
+      navigate(`/product?search=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
   return (
     <>
       {isScrolled && <div style={{ height: `${headerHeight}px` }} />}
-      <header ref={headerRef} className={`header-wrapper ${isScrolled ? 'scrolled' : ''} ${isHidden ? 'hidden' : ''}`}>
+      <header ref={headerRef} className={`header-wrapper ${isScrolled ? 'scrolled' : ''}`}>
         {/* Topbar */}
         <div className="topbar">
           <div className="topbar-container">
@@ -115,18 +133,70 @@ const Header = () => {
           <div className="header-container">
             <Link to="/" className="logo">
               <Footprints className="logo-icon" size={28} color="var(--primary)" />
-              <span className="logo-text">SneakerHub</span>
+              <span className="logo-text">Nova Store</span>
             </Link>
 
-            <form className="header-search" onSubmit={handleSearch}>
-              <input 
-                type="text" 
-                placeholder="Tìm kiếm giày thể thao, sneaker..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <button type="submit" className="search-btn"><Search size={20} /></button>
-            </form>
+            <div className="header-search-wrapper">
+              <form className="header-search" onSubmit={handleSearch}>
+                <input 
+                  type="text" 
+                  placeholder="Tìm kiếm giày thể thao, sneaker..." 
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowSuggestions(true);
+                  }}
+                  onFocus={() => setShowSuggestions(true)}
+                />
+                <button type="submit" className="search-btn"><Search size={20} /></button>
+              </form>
+              
+              {showSuggestions && searchQuery.trim() !== '' && (
+                <div className="search-suggestions-dropdown">
+                  {isSearching ? (
+                    <div className="search-suggestions-loading">Đang tìm kiếm...</div>
+                  ) : searchSuggestions.length > 0 ? (
+                    <div className="search-suggestions-list">
+                      <div className="search-suggestions-header">Sản phẩm gợi ý</div>
+                      {searchSuggestions.map(product => (
+                        <Link 
+                          to={`/product/${product.id}`} 
+                          key={product.id} 
+                          className="search-suggestion-item"
+                          onClick={() => {
+                            setShowSuggestions(false);
+                            setSearchQuery('');
+                          }}
+                        >
+                          <div className="suggestion-img">
+                            <img 
+                              src={product.image?.startsWith('http') ? product.image : `http://localhost:8080/uploads/${product.image}`} 
+                              alt={product.name} 
+                            />
+                          </div>
+                          <div className="suggestion-info">
+                            <h4 className="suggestion-name">{product.name}</h4>
+                            <p className="suggestion-price">
+                              {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
+                                .format(product.productSale?.pricesale || product.price)}
+                            </p>
+                          </div>
+                        </Link>
+                      ))}
+                      <Link 
+                        to={`/product?search=${encodeURIComponent(searchQuery)}`} 
+                        className="search-suggestion-footer"
+                        onClick={() => setShowSuggestions(false)}
+                      >
+                        Xem tất cả kết quả cho "{searchQuery}"
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="search-suggestions-empty">Không tìm thấy sản phẩm nào phù hợp.</div>
+                  )}
+                </div>
+              )}
+            </div>
 
             <div className="header-actions">
               <label className="theme-switch" title="Chế độ Sáng/Tối">
@@ -166,7 +236,7 @@ const Header = () => {
               {user ? (
                 <div className="user-dropdown-container">
                   <button 
-                    className="user-menu-btn"
+                    className="user-profile-btn"
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                   >
                     <div className="user-avatar" style={user.avatar ? { overflow: 'hidden', padding: 0 } : {}}>
@@ -180,7 +250,7 @@ const Header = () => {
                         user.name ? user.name.charAt(0).toUpperCase() : 'U'
                       )}
                     </div>
-                    <span className="user-name-text">{user.name || user.username}</span>
+                    <span className="user-name-truncate">{user.name || user.username}</span>
                   </button>
                   {dropdownOpen && (
                     <div className="user-dropdown-menu show">
@@ -219,16 +289,27 @@ const Header = () => {
                 <span>Danh mục sản phẩm</span>
               </button>
               {categoryMenuOpen && (
-                <div className="category-dropdown-menu">
-                  {categories.map(cat => (
-                    <Link 
-                      key={cat.id} 
-                      to={`/product?category=${cat.id}`} 
-                      className="category-dropdown-item"
-                      onClick={() => setCategoryMenuOpen(false)}
-                    >
-                      {cat.name}
-                    </Link>
+                <div className="category-dropdown-menu mega-menu">
+                  {categories.filter(cat => !cat.parentId).map(parent => (
+                    <div key={parent.id} className="mega-menu-column">
+                      <Link 
+                        to={`/product?category=${parent.id}`} 
+                        className="category-dropdown-item parent-item"
+                        onClick={() => setCategoryMenuOpen(false)}
+                      >
+                        {parent.name}
+                      </Link>
+                      {categories.filter(cat => cat.parentId === parent.id).map(child => (
+                        <Link 
+                          key={child.id} 
+                          to={`/product?category=${child.id}`} 
+                          className="category-dropdown-item child-item"
+                          onClick={() => setCategoryMenuOpen(false)}
+                        >
+                          {child.name}
+                        </Link>
+                      ))}
+                    </div>
                   ))}
                 </div>
               )}

@@ -173,6 +173,364 @@
   margin-bottom: 2rem;
 }
 
+.voucher-section {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px dashed #cbd5e1;
+}
+
+.voucher-input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.voucher-input-group input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--radius-sm);
+  outline: none;
+  text-transform: uppercase;
+}
+
+.voucher-input-group input:focus {
+  border-color: var(--primary);
+}
+
+.voucher-input-group button {
+  padding: 0 1.25rem;
+  background-color: var(--primary);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.voucher-input-group button:disabled {
+  background-color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.text-success {
+  color: #10b981 !important;
+}
+
+.text-red {
+  color: #ef4444 !important;
+}
+
+.available-vouchers {
+  margin-top: 1rem;
+}
+
+.available-vouchers h4 {
+  font-size: 1rem;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.voucher-cards {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 2rem;
+  overflow-x: auto;
+  padding: 1.5rem 1rem 3rem 1rem;
+  scroll-snap-type: x mandatory;
+}
+
+.voucher-cards::-webkit-scrollbar {
+  height: 6px;
+}
+.voucher-cards::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+/* ================= HOLOGRAPHIC TICKET ================= */
+.holo-card {
+  --width: 144px;
+  --height: 256px;
+  --perforation-size: 10px;
+  --cutouts-adjust: 55px;
+
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 1rem;
+  grid-template-areas:
+    "header"
+    "body"
+    "footer";
+
+  width: var(--width);
+  height: var(--height);
+  padding: var(--perforation-size) 0;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+
+  font-family: "Inter", sans-serif;
+  font-size: 1rem;
+  user-select: none;
+  overflow: hidden;
+
+  filter: drop-shadow(0 2px 1px #00000025) drop-shadow(0 4px 3px #00000025)
+    drop-shadow(0 10px 9px #00000025) drop-shadow(0 20px 20px #00000025)
+    drop-shadow(0 40px 40px #00000025);
+  animation: holo-hover 3s ease infinite;
+  will-change: transform, filter;
+}
+
+@keyframes holo-hover {
+  50% {
+    filter: drop-shadow(0 4px 3px #00000015) drop-shadow(0 6px 6px #00000015)
+      drop-shadow(0 16px 14px #00000015) drop-shadow(0 30px 28px #00000015)
+      drop-shadow(0 60px 60px #00000015);
+    transform: translateY(-7px) scale(1.02);
+  }
+}
+
+.holo-filter {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.holo-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: #fff;
+  /* Dùng nội tuyến filter url(#holo-bump) ở component React để tránh lỗi SVG filter */
+  mask:
+    /* top perforations */
+    radial-gradient(
+      circle at 50% 0,
+      #fff0 calc(var(--perforation-size) - 5px),
+      #000 calc(var(--perforation-size) - 4px)
+    ),
+    /* bottom perforations */
+      radial-gradient(
+        circle at 50% 100%,
+        #fff0 calc(var(--perforation-size) - 5px),
+        #000 calc(var(--perforation-size) - 4px)
+      ),
+    /* left notch */
+      radial-gradient(circle 8px at left center, #000 98%, #0000 100%),
+    /* right notch */
+      radial-gradient(circle 8px at right center, #000 98%, #0000 100%),
+    /* cut perforation */
+      repeating-linear-gradient(
+        90deg,
+        #000 10px,
+        #000 15px,
+        #0000 16px,
+        #0000 24px
+      );
+
+  mask-repeat: repeat-x, repeat-x, no-repeat, no-repeat, repeat-x;
+
+  mask-size:
+    calc(var(--perforation-size) * 2) 100%,
+    calc(var(--perforation-size) * 2) 100%,
+    16px 16px,
+    16px 16px,
+    10px 2px;
+
+  mask-position:
+    calc(0.5 * var(--perforation-size)) top,
+    calc(0.5 * var(--perforation-size)) bottom,
+    left var(--cutouts-adjust),
+    right var(--cutouts-adjust),
+    0 calc(var(--cutouts-adjust) + 7px);
+
+  mask-composite: intersect, exclude, add, add;
+}
+
+.holo-holographic {
+  background-image: linear-gradient(to bottom, #fe58, 90%, #0002),
+    conic-gradient(
+      at 60% 50%,
+      #ccc,
+      #ff6bfe,
+      #00f9f8,
+      #ddd,
+      #0081fd,
+      #eef0bc,
+      #0081fd,
+      #ff6bfe,
+      #0002,
+      #0081fd,
+      #ddd,
+      #01fefb,
+      #ccc
+    );
+}
+.holo-holographic::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 70% 20%, #f0f, #0000),
+    repeating-radial-gradient(circle at 30% 80%, #fff, #f4a 48px, #eeeeee 150px);
+  mix-blend-mode: color-burn;
+}
+.holo-holographic::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(to bottom, #f205, #f00, #0f0, #f205);
+  mix-blend-mode: difference;
+
+  animation: holo-bg-pos 3s ease-in-out infinite alternate;
+  background-position: 0 0;
+  background-size: 100% 300%;
+  background-repeat: repeat;
+}
+
+@keyframes holo-bg-pos {
+  to {
+    background-position: 0 500px;
+  }
+}
+
+.holo-header {
+  position: relative;
+  grid-area: header;
+  margin: 0 8px;
+  text-align: center;
+  z-index: 1;
+  font-family: "Impact", sans-serif;
+  font-size: 1.5rem; /* Adjusted for voucher code length */
+  letter-spacing: 1px;
+  color: #ffffff9f;
+  text-shadow: 0 0 0 #000;
+  -webkit-text-stroke: #fff 0.5px;
+  mix-blend-mode: difference;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  word-break: break-all;
+  min-height: 50px;
+}
+
+.holo-body {
+  grid-area: body;
+  margin: 0 1em;
+  padding: 0.5em;
+  font-weight: 500;
+  font-size: 0.85rem;
+  z-index: 1;
+  color: #111;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.holo-body em {
+  font-size: 1.1rem;
+  font-style: normal;
+  font-weight: 800;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.holo-footer {
+  grid-area: footer;
+  z-index: 1;
+  margin: 0 1em 1em 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.holo-number {
+  margin-bottom: 0.75rem;
+  text-align: center;
+  width: 100%;
+}
+
+.holo-btn {
+  width: 100%;
+  padding: 0.4rem;
+  background: #000;
+  color: #fff;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.holo-btn:hover {
+  background: #222;
+  transform: scale(1.05);
+}
+
+.holo-barcode {
+  justify-self: center;
+  width: 0;
+  height: 32px;
+  box-shadow:
+    0px 0 0 1px #000,
+    5px 0 0 1px #000,
+    7px 0 0 1px #000,
+    11px 0 0 1px #000,
+    15px 0 0 1px #000,
+    16px 0 0 1px #000,
+    22px 0 0 1px #000,
+    27px 0 0 1px #000,
+    30px 0 0 1px #000,
+    35px 0 0 1px #000,
+    36px 0 0 1px #000,
+    39px 0 0 1px #000,
+    43px 0 0 1px #000,
+    47px 0 0 1px #000,
+    50px 0 0 1px #000,
+    55px 0 0 1px #000,
+    59px 0 0 1px #000,
+    60px 0 0 1px #000,
+    64px 0 0 1px #000,
+    69px 0 0 1px #000,
+    70px 0 0 1px #000,
+    74px 0 0 1px #000;
+  transform: translateX(-37px); /* Fixed translation to center barcode properly */
+}
+
+.holo-symbol {
+  position: absolute;
+  top: 1.3em;
+  right: -5px;
+  rotate: 185deg;
+  font-size: 1.1em;
+  color: #fff;
+  line-height: 0.5;
+  opacity: 0.2;
+}
+
+.holo-notes {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-size: 4rem;
+  color: #e7e7e7;
+  mix-blend-mode: color-burn;
+  transform: translateY(20%);
+  z-index: 1;
+}
+.holo-notes:nth-child(2) {
+  transform: translateY(40%);
+}
+.holo-notes:nth-child(3) {
+  transform: translateY(60%);
+}
+
 .total-row {
   display: flex;
   justify-content: space-between;
@@ -272,4 +630,117 @@
   font-size: 0.85rem;
   margin-top: 0.5rem;
   display: block;
+}
+
+/* ================= PREMIUM SUCCESS COMPONENT ================= */
+.checkout-success-premium {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  padding: 2rem;
+  background-color: #f8fafc;
+}
+
+.success-card {
+  background: white;
+  max-width: 600px;
+  width: 100%;
+  padding: 4rem 3rem;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0,0,0,0.05);
+  text-align: center;
+  animation: authSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  border: 1px solid #f1f5f9;
+}
+
+.success-icon-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ecfdf5;
+  border-radius: 50%;
+}
+
+.success-icon-ring {
+  position: absolute;
+  top: -10px; left: -10px; right: -10px; bottom: -10px;
+  border: 2px solid #34d399;
+  border-radius: 50%;
+  animation: authPulse 2s infinite;
+}
+
+.success-card h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #064e3b;
+  margin-bottom: 0.5rem;
+  letter-spacing: -1px;
+}
+
+.order-reference {
+  display: inline-block;
+  background: #f1f5f9;
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
+  color: #475569;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.order-reference strong {
+  color: #0f172a;
+}
+
+.success-message {
+  color: #64748b;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 3rem;
+}
+
+.success-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.success-actions button {
+  padding: 1rem 2rem;
+  font-size: 1.05rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.success-actions .btn-primary {
+  background: #10b981;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.success-actions .btn-primary:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.redirect-text {
+  color: #94a3b8;
+  font-size: 0.95rem;
+  font-style: italic;
+  animation: authPulse 2s infinite alternate;
+}
+
+@keyframes authSlideUp {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes authPulse {
+  0% { opacity: 0.5; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1.05); }
 }

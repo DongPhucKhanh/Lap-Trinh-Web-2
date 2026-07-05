@@ -7,6 +7,7 @@ import { ToastContainer } from 'react-toastify';
 import ScrollToTop from './components/ScrollToTop';
 import Lenis from '@studio-freight/lenis';
 import 'react-toastify/dist/ReactToastify.css';
+import ChatBox from './components/ChatBox/ChatBox';
 import './App.css';
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
       <CartProvider>
         <ScrollToTop />
         <AppRoutes />
+        <ChatBox />
         <ToastContainer position="bottom-right" autoClose={3000} theme="colored" />
       </CartProvider>
     </AuthProvider>

@@ -51,7 +51,7 @@ const PostDetail = () => {
 
   return (
     <div className="post-detail-page">
-      <div className="container" style={{maxWidth: 800}}>
+      <div className="container" style={{maxWidth: '100%', padding: '0 2rem'}}>
         <button className="back-btn" onClick={() => navigate('/post')}>
           <ArrowLeft size={20} /> Quay lại Tin Tức
         </button>

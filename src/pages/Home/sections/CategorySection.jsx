@@ -75,7 +75,7 @@ const CategorySection = ({ categories }) => {
             className="flex gap-6 overflow-x-auto snap-x snap-mandatory hide-scroll pb-8 pt-4 px-4 -mx-4 scroll-smooth"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {categories.map((cat, index) => {
+            {categories.filter(c => !c.parentId).map((cat, index) => {
               const imageUrl = cat.image?.startsWith('http') ? cat.image : `http://localhost:8080/uploads/${cat.image}`;
               
               return (

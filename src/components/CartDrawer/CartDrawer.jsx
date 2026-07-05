@@ -47,20 +47,27 @@ const CartDrawer = ({ isOpen, onClose }) => {
                   : 'https://placehold.co/100x100/f4f7f6/636e72';
 
                 return (
-                  <li key={item.id} className="cart-drawer-item">
+                  <li key={item.cartItemId} className="cart-drawer-item">
                     <div className="item-image">
                       <img src={itemImage} alt={item.name} />
                     </div>
                     <div className="item-details">
                       <h4 className="item-name">{item.name}</h4>
+                      {(item.selectedColor || item.selectedSize) && (
+                        <div className="item-variant" style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '4px' }}>
+                          {item.selectedColor && `Màu: ${item.selectedColor}`} 
+                          {item.selectedColor && item.selectedSize && ' | '}
+                          {item.selectedSize && `Size: ${item.selectedSize}`}
+                        </div>
+                      )}
                       <div className="item-price">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(itemPrice)}</div>
                       <div className="item-actions">
                         <div className="quantity-control-mini">
-                          <button onClick={() => updateQuantity(item.id, item.quantity - 1)}><Minus size={14}/></button>
+                          <button onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}><Minus size={14}/></button>
                           <span>{item.quantity}</span>
-                          <button onClick={() => updateQuantity(item.id, item.quantity + 1)}><Plus size={14}/></button>
+                          <button onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}><Plus size={14}/></button>
                         </div>
-                        <button className="remove-btn" onClick={() => removeFromCart(item.id)}>
+                        <button className="remove-btn" onClick={() => removeFromCart(item.cartItemId)}>
                           <Trash2 size={16} />
                         </button>
                       </div>

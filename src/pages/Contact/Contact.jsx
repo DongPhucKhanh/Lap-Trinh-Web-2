@@ -50,7 +50,7 @@ const Contact = () => {
       <div className="container">
         <div className="contact-header">
           <h1>Liên hệ với chúng tôi</h1>
-          <p>Bạn có câu hỏi hoặc cần hỗ trợ? Đừng ngần ngại liên hệ với SneakerHub nhé!</p>
+          <p>Bạn có câu hỏi hoặc cần hỗ trợ? Đừng ngần ngại liên hệ với Nova Store nhé!</p>
         </div>
 
         <div className="contact-grid">
@@ -76,7 +76,7 @@ const Contact = () => {
               <div className="info-icon"><Mail size={24} /></div>
               <div>
                 <h3>Email liên hệ</h3>
-                <p>support@sneakerhub.vn</p>
+                <p>support@Nova Store.vn</p>
               </div>
             </div>
 
@@ -97,7 +97,7 @@ const Contact = () => {
 
           {/* Form Side */}
           <div className="contact-form-side">
-            <h2>Gửi lời nhắn cho SneakerHub</h2>
+            <h2>Gửi lời nhắn cho Nova Store</h2>
             {success && <div className="alert-success">{success}</div>}
             {error && <div className="alert-error">{error}</div>}
 

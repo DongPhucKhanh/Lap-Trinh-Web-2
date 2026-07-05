@@ -61,8 +61,8 @@ const Slideshow = () => {
           >
             <div className="slide-overlay">
               <div className="slide-content">
-                <h2>{banner.name || banner.title}</h2>
-                <p>{banner.description}</p>
+                {/* <h2>{banner.name || banner.title}</h2>
+                <p>{banner.description}</p> */}
                 <Link to={banner.link || '/product'} className="btn-primary">Xem Ngay</Link>
               </div>
             </div>

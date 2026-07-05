@@ -37,7 +37,7 @@ const ProductList = () => {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
-  const itemsPerPage = 12;
+  const itemsPerPage = 4;
 
   // Favorites
   const [favorites, setFavorites] = useState(new Set());
@@ -179,14 +179,24 @@ const ProductList = () => {
               >
                 Tất cả đôi giày
               </li>
-              {categories.map(cat => (
-                <li 
-                  key={cat.id}
-                  className={filter.categoryId === cat.id.toString() ? 'active' : ''}
-                  onClick={() => { setFilter(prev => ({...prev, categoryId: cat.id.toString()})); setCurrentPage(1); }}
-                >
-                  {cat.name}
-                </li>
+              {categories.filter(cat => !cat.parentId).map(parent => (
+                <React.Fragment key={parent.id}>
+                  <li 
+                    className={`parent-category ${filter.categoryId === parent.id.toString() ? 'active' : ''}`}
+                    onClick={() => { setFilter(prev => ({...prev, categoryId: parent.id.toString()})); setCurrentPage(1); }}
+                  >
+                    {parent.name}
+                  </li>
+                  {categories.filter(cat => cat.parentId === parent.id).map(child => (
+                    <li 
+                      key={child.id}
+                      className={`child-category ${filter.categoryId === child.id.toString() ? 'active' : ''}`}
+                      onClick={() => { setFilter(prev => ({...prev, categoryId: child.id.toString()})); setCurrentPage(1); }}
+                    >
+                      {child.name}
+                    </li>
+                  ))}
+                </React.Fragment>
               ))}
             </ul>
           </div>

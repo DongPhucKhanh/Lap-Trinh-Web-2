@@ -98,12 +98,12 @@ const ProductDetail = () => {
     if (!user) {
       toast.info('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!');
       navigate('/login');
-      return;
+      return false;
     }
 
     if (variants.length > 0 && (!selectedColor || !selectedSize)) {
       toast.warning('Vui lòng chọn màu sắc và kích cỡ!');
-      return;
+      return false;
     }
 
     let maxQty = product.productStore?.qty || 0;
@@ -113,7 +113,7 @@ const ProductDetail = () => {
       const selectedVariant = variants.find(v => v.color === selectedColor && v.size === selectedSize);
       if (!selectedVariant || selectedVariant.qty <= 0) {
         toast.warning('Sản phẩm với lựa chọn này đã hết hàng!');
-        return;
+        return false;
       }
       maxQty = selectedVariant.qty;
       variantId = selectedVariant.id;
@@ -129,11 +129,20 @@ const ProductDetail = () => {
       } else {
         toast.warning(`Tồn kho chỉ còn ${maxQty} sản phẩm!`);
       }
-      return;
+      return false;
     }
 
     addToCart({ ...product, selectedColor, selectedSize, variantId }, quantity);
     toast.success('Đã thêm vào giỏ hàng!');
+    return true;
+  };
+
+  const handleBuyNow = () => {
+    const success = handleAddToCart();
+    if (success) {
+      const cartItemId = `${product.id}-${selectedColor || 'default'}-${selectedSize || 'default'}`;
+      navigate('/checkout', { state: { selectedItems: [cartItemId] } });
+    }
   };
 
   const toggleWishlist = async () => {
@@ -283,7 +292,7 @@ const ProductDetail = () => {
               <div className="variant-section mb-4">
                 <div className="size-selector-header">
                   <h3 style={{ fontSize: '1rem', fontWeight: 600 }}>Kích cỡ: <span style={{ color: '#666', fontWeight: 400 }}>{selectedSize || 'Vui lòng chọn'}</span></h3>
-                  <button className="size-guide-btn">📏 Hướng dẫn chọn size</button>
+                  
                 </div>
                 <div className="sizes-grid">
                   {variants.filter(v => v.color === selectedColor && v.size && v.size.trim() !== '').map((v) => (
@@ -321,6 +330,14 @@ const ProductDetail = () => {
                 disabled={variants.length > 0 ? !variants.some(v=>v.color===selectedColor && v.size===selectedSize && v.qty>0) : (!product.productStore?.qty || product.productStore.qty === 0)}
               >
                 {(variants.length > 0 ? !variants.some(v=>v.color===selectedColor && v.size===selectedSize && v.qty>0) : (!product.productStore?.qty || product.productStore.qty === 0)) ? 'Hết hàng' : 'Thêm vào giỏ'}
+              </button>
+
+              <button 
+                className="btn-buy-now" 
+                onClick={handleBuyNow}
+                disabled={variants.length > 0 ? !variants.some(v=>v.color===selectedColor && v.size===selectedSize && v.qty>0) : (!product.productStore?.qty || product.productStore.qty === 0)}
+              >
+                Mua ngay
               </button>
               
               <button className="btn-favorite" onClick={toggleWishlist}>

@@ -24,7 +24,7 @@ const testimonials = [
   { 
     name: 'Phạm Ngọc Linh', 
     role: 'Đối tác bán hàng', 
-    text: 'Mình là đối tác bán lại của SneakerHub. Nguồn hàng ổn định, chính sách hỗ trợ tốt. Rất yên tâm khi hợp tác lâu dài.', 
+    text: 'Mình là đối tác bán lại của Nova Store. Nguồn hàng ổn định, chính sách hỗ trợ tốt. Rất yên tâm khi hợp tác lâu dài.', 
     stars: 4, 
     color: '#2ecc71' 
   },

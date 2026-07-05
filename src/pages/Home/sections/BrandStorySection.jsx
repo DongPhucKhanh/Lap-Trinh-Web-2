@@ -45,7 +45,7 @@ const BrandStorySection = () => {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            Bắt đầu từ một căn bếp nhỏ với tình yêu mãnh liệt dành cho giày thể thao, SneakerHub ra đời với sứ mệnh mang đến những đôi giày không chỉ đẹp mắt mà còn đảm bảo chất lượng tuyệt đối.
+            Bắt đầu từ một căn bếp nhỏ với tình yêu mãnh liệt dành cho giày thể thao, Nova Store ra đời với sứ mệnh mang đến những đôi giày không chỉ đẹp mắt mà còn đảm bảo chất lượng tuyệt đối.
           </motion.p>
           
           <motion.p 

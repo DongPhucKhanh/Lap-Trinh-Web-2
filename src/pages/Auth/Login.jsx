@@ -41,10 +41,10 @@ const Login = () => {
           <div className="auth-hero-overlay"></div>
           
           <div className="auth-floating-element auth-float-1">
-            <img src="https://placehold.co/100x100/transparent/fff?text=🍿" alt="snack" style={{width: '60px', filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.3))'}} />
+            <img src="https://placehold.co/100x100/transparent/fff?text=👟" alt="sneaker" style={{width: '60px', filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.3))'}} />
           </div>
           <div className="auth-floating-element auth-float-2">
-            <img src="https://placehold.co/100x100/transparent/fff?text=🍫" alt="snack" style={{width: '80px', filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.3))'}} />
+            <img src="https://placehold.co/100x100/transparent/fff?text=🔥" alt="fire" style={{width: '80px', filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.3))'}} />
           </div>
 
           <div className="auth-hero-content">
@@ -52,16 +52,16 @@ const Login = () => {
               <div className="auth-brand-logo">
                 <span style={{color: 'white', fontWeight: 900, fontSize: '20px'}}>S</span>
               </div>
-              SneakerHub
+              Nova Store
             </div>
 
             <div className="auth-hero-text">
-              <h1>Khám Phá Niềm Vui<br/>Trong Từng Hương Vị</h1>
-              <p>Tham gia cùng hàng ngàn tín giày thể thao thưởng thức những mẫu giày thượng hạng giao hàng toàn quốc. Hương vị yêu thích chỉ cách bạn một cú click.</p>
+              <h1>Khám Phá Phong Cách<br/>Trong Từng Bước Chân</h1>
+              <p>Tham gia cùng hàng ngàn tín đồ giày thể thao trải nghiệm những mẫu giày thượng hạng giao hàng toàn quốc. Đôi giày yêu thích chỉ cách bạn một cú click.</p>
               
               <div className="auth-hero-badges">
                 <div className="hero-badge"><Truck size={18} color="#fcd34d" /> Giao Hàng Toàn Quốc</div>
-                <div className="hero-badge"><CheckCircle size={18} color="#10b981" /> Tươi Ngon Mỗi Ngày</div>
+                <div className="hero-badge"><CheckCircle size={18} color="#10b981" /> Mẫu Mới Mỗi Ngày</div>
                 <div className="hero-badge"><ShieldCheck size={18} color="#60a5fa" /> Thanh Toán An Toàn</div>
               </div>
             </div>

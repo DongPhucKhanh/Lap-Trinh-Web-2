@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Lock, Mail, Phone, Users, CheckCircle, Truck, ShieldCheck, Star } from 'lucide-react';
+import { User, Lock, Mail, Phone, Users, CheckCircle, Truck, ShieldCheck, Star, MapPin } from 'lucide-react';
 import api from '../../services/api';
 import './Auth.css';
 
@@ -12,6 +12,7 @@ const Register = () => {
     confirmPassword: '',
     email: '',
     phone: '',
+    address: '',
     gender: 'Nam'
   });
   
@@ -43,6 +44,7 @@ const Register = () => {
         password: formData.password,
         email: formData.email,
         phone: formData.phone,
+        address: formData.address,
         gender: formData.gender
       });
       
@@ -72,10 +74,10 @@ const Register = () => {
           <div className="auth-hero-overlay"></div>
           
           <div className="auth-floating-element auth-float-1">
-            <img src="https://placehold.co/100x100/transparent/fff?text=🍿" alt="snack" style={{width: '60px', filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.3))'}} />
+            <img src="https://placehold.co/100x100/transparent/fff?text=👟" alt="sneaker" style={{width: '60px', filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.3))'}} />
           </div>
           <div className="auth-floating-element auth-float-2">
-            <img src="https://placehold.co/100x100/transparent/fff?text=🍫" alt="snack" style={{width: '80px', filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.3))'}} />
+            <img src="https://placehold.co/100x100/transparent/fff?text=🔥" alt="fire" style={{width: '80px', filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.3))'}} />
           </div>
 
           <div className="auth-hero-content">
@@ -83,7 +85,7 @@ const Register = () => {
               <div className="auth-brand-logo">
                 <span style={{color: 'white', fontWeight: 900, fontSize: '20px'}}>S</span>
               </div>
-              SneakerHub
+              Nova Store
             </div>
 
             <div className="auth-hero-text">
@@ -92,7 +94,7 @@ const Register = () => {
               
               <div className="auth-hero-badges">
                 <div className="hero-badge"><Truck size={18} color="#fcd34d" /> Giao Hàng Toàn Quốc</div>
-                <div className="hero-badge"><CheckCircle size={18} color="#10b981" /> Tươi Ngon Mỗi Ngày</div>
+                <div className="hero-badge"><CheckCircle size={18} color="#10b981" /> Mẫu Mới Mỗi Ngày</div>
                 <div className="hero-badge"><ShieldCheck size={18} color="#60a5fa" /> Thanh Toán An Toàn</div>
               </div>
             </div>
@@ -179,9 +181,16 @@ const Register = () => {
                       <option value="Nữ">Nữ</option>
                       <option value="Khác">Khác</option>
                     </select>
-                    {/* Select doesn't trigger placeholder-shown reliably in all browsers, so we keep label lifted */}
                     <label className="premium-floating-label" style={{ transform: 'translateY(-22px) scale(0.75)', color: 'var(--auth-primary)', fontWeight: 600 }}>Giới tính</label>
                   </div>
+                </div>
+              </div>
+
+              <div className="premium-form-group">
+                <div className="premium-input-wrapper">
+                  <MapPin size={20} className="premium-input-icon" />
+                  <input type="text" className="premium-input" name="address" placeholder=" " value={formData.address} onChange={handleChange} required />
+                  <label className="premium-floating-label">Địa chỉ</label>
                 </div>
               </div>
 

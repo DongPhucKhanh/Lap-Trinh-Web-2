@@ -9,10 +9,10 @@ const Footer = () => {
       <div className="footer-top">
         {/* Column 1: About */}
         <div className="footer-column">
-          <h3>Về SneakerHub</h3>
+          <h3>Về Nova Store</h3>
           <p>
-            SneakerHub - Thiên đường giày thể thao dành cho bạn. Chúng tôi cam kết mang đến những 
-            sản phẩm chất lượng nhất, ngon nhất và đảm bảo chất lượng và độ bền.
+            Nova Store - Thiên đường giày thể thao dành cho bạn. Chúng tôi cam kết mang đến những 
+            sản phẩm tốt nhất, phong cách nhất và đảm bảo chất lượng cùng độ bền.
           </p>
           <div className="footer-socials">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="social-icon">FB</a>
@@ -47,27 +47,16 @@ const Footer = () => {
             </li>
             <li>
               <Mail size={18} />
-              <span>contact@sneakerhub.vn</span>
+              <span>contact@Nova Store.vn</span>
             </li>
           </ul>
         </div>
 
-        {/* Column 4: Map */}
-        <div className="footer-column">
-          <h3>Bản Đồ</h3>
-          <div className="map-container">
-            <iframe 
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.669658423702!2d106.6662753147489!3d10.75992006243956!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f1b7c3ed289%3A0xa06651894598e403!2zMTIzIMSQxrDhu51uZyDEg24gVuG6t3QsIFBoxrDhu51uZyA1LCBRdeG6rW4gMTAsIFRow6BuaCBwaOG7kSBI4buTIENow60gTWluaA!5e0!3m2!1svi!2s!4v1622378345479!5m2!1svi!2s" 
-              allowFullScreen="" 
-              loading="lazy" 
-              title="Google Maps"
-            ></iframe>
-          </div>
-        </div>
+
       </div>
 
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} SneakerHub. Mọi mẫu giày đều ở đây!</p>
+        <p>&copy; {new Date().getFullYear()} Nova Store. Mọi mẫu giày đều ở đây!</p>
       </div>
     </footer>
   );

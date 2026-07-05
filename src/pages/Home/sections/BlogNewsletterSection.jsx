@@ -85,7 +85,7 @@ const BlogNewsletterSection = ({ posts }) => {
           
           <div className="relative z-10 md:w-1/2">
             <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4">Đăng ký nhận <br/><span className="text-primary">ưu đãi độc quyền</span></h2>
-            <p className="text-gray-400 text-lg">Đừng bỏ lỡ các voucher giảm giá và thông tin sản phẩm mới nhất từ SneakerHub.</p>
+            <p className="text-gray-400 text-lg">Đừng bỏ lỡ các voucher giảm giá và thông tin sản phẩm mới nhất từ Nova Store.</p>
           </div>
           
           <div className="relative z-10 w-full md:w-1/2">

@@ -305,9 +305,35 @@
 /* Actions */
 .detail-actions {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr 1fr;
   gap: 1rem;
   margin-bottom: 2rem;
+}
+
+.btn-buy-now {
+  width: 100%;
+  background: var(--primary);
+  color: white;
+  padding: 1.2rem;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-buy-now:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.btn-buy-now:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }
 
 .btn-add-cart {

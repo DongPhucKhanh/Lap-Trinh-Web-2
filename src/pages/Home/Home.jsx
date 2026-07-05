@@ -6,6 +6,7 @@ import FeaturesSection from './sections/FeaturesSection';
 import CategorySection from './sections/CategorySection';
 import ParallaxBannerSection from './sections/ParallaxBannerSection';
 import BestSellerSection from './sections/BestSellerSection';
+import NewProductsSection from './sections/NewProductsSection';
 import FlashSaleSection from './sections/FlashSaleSection';
 import TestimonialSection from './sections/TestimonialSection';
 import BlogNewsletterSection from './sections/BlogNewsletterSection';
@@ -64,8 +65,16 @@ const Home = () => {
   }, []);
 
   // Compute sections data
-  const flashSaleProducts = products.filter(p => p.productSale && p.productSale.pricesale).slice(0, 4);
-  const bestSellers = [...products].sort((a, b) => b.id - a.id).slice(0, 8);
+  const flashSaleProducts = products.filter(p => p.productSale && p.productSale.pricesale > 0).slice(0, 4);
+  const newProducts = [...products].sort((a, b) => b.id - a.id).slice(0, 4);
+  
+  // For BestSellers we prioritize isFeatured products, then fallback to rest.
+  let bestSellers = [...products].filter(p => p.isFeatured).slice(0, 4);
+  if (bestSellers.length < 4) {
+    const remaining = [...products].filter(p => !p.isFeatured).slice(0, 4 - bestSellers.length);
+    bestSellers = [...bestSellers, ...remaining];
+  }
+
   const comboProducts = products.filter(p => p.name.toLowerCase().includes('combo') || p.category?.name.toLowerCase().includes('combo')).slice(0, 4);
   const latestPosts = [...posts].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 3);
 
@@ -83,6 +92,7 @@ const Home = () => {
       <BrandStorySection />
       <FeaturesSection />
       <CategorySection categories={categories} />
+      <NewProductsSection products={newProducts} />
       <FlashSaleSection products={flashSaleProducts.length > 0 ? flashSaleProducts : comboProducts} flashSaleEndTime={flashSaleEndTime} />
       <ParallaxBannerSection />
       <BestSellerSection products={bestSellers} />

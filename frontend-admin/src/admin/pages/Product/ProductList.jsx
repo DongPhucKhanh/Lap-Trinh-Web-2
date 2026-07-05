@@ -54,7 +54,7 @@ const ProductList = () => {
             Thùng rác
           </Link>
           <Link to="/admin/product/create" className="btn-primary">
-            <Plus size={18} /> Thêm Món Mới
+            <Plus size={18} /> Thêm Hàng Mới
           </Link>
         </div>
       </div>
@@ -67,7 +67,7 @@ const ProductList = () => {
               <tr>
                 <th>ID</th>
                 <th>Hình ảnh</th>
-                <th>Tên món</th>
+                <th>Tên sản phẩm</th>
                 <th>Giá bán</th>
                 <th>Danh mục</th>
                 <th>Tồn kho</th>

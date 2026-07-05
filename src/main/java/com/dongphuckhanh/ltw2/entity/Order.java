@@ -75,6 +75,14 @@ public class Order {
     @Column(name = "payment_method")
     private String paymentMethod;
 
+    /** Mã giảm giá (nếu có) */
+    @Column(name = "voucher_code", length = 50)
+    private String voucherCode;
+
+    /** Số tiền được giảm (nếu có) */
+    @Column(name = "discount_amount")
+    private Double discountAmount;
+
     /** Danh sách chi tiết sản phẩm trong đơn hàng */
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderDetail> orderDetails;

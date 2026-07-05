@@ -48,12 +48,14 @@ public class CustomerController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCustomer(@PathVariable Long id, @RequestBody User userDetails) {
         return userRepository.findById(id).map(user -> {
-            user.setName(userDetails.getName());
-            user.setEmail(userDetails.getEmail());
-            user.setPhone(userDetails.getPhone());
-            user.setAddress(userDetails.getAddress());
-            user.setGender(userDetails.getGender());
-            user.setStatus(userDetails.getStatus());
+            if (userDetails.getName() != null) user.setName(userDetails.getName());
+            if (userDetails.getEmail() != null) user.setEmail(userDetails.getEmail());
+            if (userDetails.getPhone() != null) user.setPhone(userDetails.getPhone());
+            if (userDetails.getAddress() != null) user.setAddress(userDetails.getAddress());
+            if (userDetails.getGender() != null) user.setGender(userDetails.getGender());
+            if (userDetails.getStatus() != null) user.setStatus(userDetails.getStatus());
+            if (userDetails.getRoles() != null) user.setRoles(userDetails.getRoles());
+            if (userDetails.getAdminNote() != null) user.setAdminNote(userDetails.getAdminNote());
             // Update password if provided
             if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
                 user.setPassword(passwordEncoder.encode(userDetails.getPassword()));

@@ -19,7 +19,7 @@ public class ProductController {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    // 1. Lấy tất cả món ăn (trừ các món đã xóa mềm)
+    // 1. Lấy tất cả sản phẩm (trừ các món đã xóa mềm)
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts() {
         return ResponseEntity.ok(productRepository.findByStatusNot(-1));
@@ -60,7 +60,7 @@ public class ProductController {
         return ResponseEntity.ok(result);
     }
 
-    // 2. Lấy món ăn theo ID
+    // 2. Lấy sản phẩm theo ID
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         return productRepository.findById(id)
@@ -68,13 +68,13 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // 3. Lấy danh sách món ăn theo Category ID
+    // 3. Lấy danh sách sản phẩm theo Category ID
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable Long categoryId) {
         return ResponseEntity.ok(productRepository.findByCategoryId(categoryId));
     }
 
-    // 4. Thêm món ăn mới (Cần truyền category_id vào JSON)
+    // 4. Thêm sản phẩm mới (Cần truyền category_id vào JSON)
     @PostMapping
     public ResponseEntity<?> createProduct(@RequestBody Product product) {
         if (product.getCategory() == null || product.getCategory().getId() == null) {
@@ -100,7 +100,7 @@ public class ProductController {
         }
     }
 
-    // 5. Cập nhật món ăn
+    // 5. Cập nhật sản phẩm
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
         return productRepository.findById(id)
@@ -156,7 +156,7 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // 6. Xóa mềm món ăn
+    // 6. Xóa mềm sản phẩm
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
         return productRepository.findById(id)
@@ -168,7 +168,7 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // 7. Khôi phục món ăn
+    // 7. Khôi phục sản phẩm
     @PutMapping("/{id}/restore")
     public ResponseEntity<?> restoreProduct(@PathVariable Long id) {
         return productRepository.findById(id)

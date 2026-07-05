@@ -56,17 +56,17 @@ public class EmailService {
 
     // 1. Email đăng ký tài khoản (OTP)
     public void sendRegistrationOtp(String email, String otp) {
-        String subject = "Xác nhận đăng ký tài khoản - SnackHub";
+        String subject = "Xác nhận đăng ký tài khoản - SneakerHub";
         String htmlContent = """
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                <h2 style="color: #ff6b6b; text-align: center;">Chào mừng đến với SnackHub!</h2>
+                <h2 style="color: #ff6b6b; text-align: center;">Chào mừng đến với SneakerHub!</h2>
                 <p>Cảm ơn bạn đã đăng ký tài khoản. Để hoàn tất quá trình đăng ký, vui lòng sử dụng mã xác thực sau:</p>
                 <div style="text-align: center; margin: 30px 0;">
                     <span style="font-size: 32px; font-weight: bold; background: #f4f7f6; padding: 10px 20px; letter-spacing: 5px; color: #333; border-radius: 5px;">%s</span>
                 </div>
                 <p>Mã này có hiệu lực trong vòng 10 phút. Nếu bạn không yêu cầu đăng ký, vui lòng bỏ qua email này.</p>
                 <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-                <p style="font-size: 12px; color: #999; text-align: center;">Đội ngũ SnackHub</p>
+                <p style="font-size: 12px; color: #999; text-align: center;">Đội ngũ SneakerHub</p>
             </div>
         """.formatted(otp);
         sendHtmlEmail(email, subject, htmlContent);
@@ -74,17 +74,17 @@ public class EmailService {
 
     // 2. Email quên mật khẩu (OTP)
     public void sendForgotPasswordOtp(String email, String otp) {
-        String subject = "Mã OTP Đặt Lại Mật Khẩu - SnackHub";
+        String subject = "Mã OTP Đặt Lại Mật Khẩu - SneakerHub";
         String htmlContent = """
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
                 <h2 style="color: #ff6b6b; text-align: center;">Khôi phục mật khẩu</h2>
-                <p>Bạn vừa yêu cầu đặt lại mật khẩu cho tài khoản SnackHub. Dưới đây là mã xác nhận (OTP) của bạn:</p>
+                <p>Bạn vừa yêu cầu đặt lại mật khẩu cho tài khoản SneakerHub. Dưới đây là mã xác nhận (OTP) của bạn:</p>
                 <div style="text-align: center; margin: 30px 0;">
                     <span style="font-size: 32px; font-weight: bold; background: #f4f7f6; padding: 10px 20px; letter-spacing: 5px; color: #333; border-radius: 5px;">%s</span>
                 </div>
                 <p>Vui lòng không chia sẻ mã này cho bất kỳ ai. Mã này có hiệu lực trong vòng 10 phút.</p>
                 <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-                <p style="font-size: 12px; color: #999; text-align: center;">Đội ngũ SnackHub</p>
+                <p style="font-size: 12px; color: #999; text-align: center;">Đội ngũ SneakerHub</p>
             </div>
         """.formatted(otp);
         sendHtmlEmail(email, subject, htmlContent);
@@ -92,7 +92,7 @@ public class EmailService {
 
     // 3. Email xác nhận đặt hàng thành công
     public void sendOrderConfirmation(String email, Order order, List<OrderDetail> details) {
-        String subject = "Xác nhận đơn hàng #" + order.getId() + " - SnackHub";
+        String subject = "Xác nhận đơn hàng #" + order.getId() + " - SneakerHub";
         
         StringBuilder itemsHtml = new StringBuilder();
         java.math.BigDecimal total = java.math.BigDecimal.ZERO;
@@ -129,7 +129,7 @@ public class EmailService {
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
                 <h2 style="color: #2ecc71; text-align: center;">Đặt hàng thành công!</h2>
                 <p>Chào <b>%s</b>,</p>
-                <p>Cảm ơn bạn đã đặt hàng tại SnackHub. Đơn hàng <b>#%d</b> của bạn đã được ghi nhận và đang chờ xử lý.</p>
+                <p>Cảm ơn bạn đã đặt hàng tại SneakerHub. Đơn hàng <b>#%d</b> của bạn đã được ghi nhận và đang chờ xử lý.</p>
                 <p><b>Thời gian đặt hàng:</b> %s</p>
                 
                 <h3 style="color: #333; margin-top: 30px;">Thông tin giao hàng:</h3>
@@ -160,7 +160,7 @@ public class EmailService {
                 
                 <p style="margin-top: 30px;">Chúng tôi sẽ thông báo cho bạn khi đơn hàng thay đổi trạng thái.</p>
                 <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-                <p style="font-size: 12px; color: #999; text-align: center;">Đội ngũ SnackHub</p>
+                <p style="font-size: 12px; color: #999; text-align: center;">Đội ngũ SneakerHub</p>
             </div>
         """.formatted(
             order.getDeliveryName(), 
@@ -211,7 +211,7 @@ public class EmailService {
             case 5:
                 statusText = "Hoàn thành";
                 color = "#27ae60"; // Dark Green
-                message = "Đơn hàng đã hoàn thành. Chúc bạn có trải nghiệm tuyệt vời cùng SnackHub!";
+                message = "Đơn hàng đã hoàn thành. Chúc bạn có trải nghiệm tuyệt vời cùng SneakerHub!";
                 break;
             case 6:
                 statusText = "Đã hủy";
@@ -268,7 +268,7 @@ public class EmailService {
             ? order.getCreatedAt().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))
             : java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
 
-        String subject = "Cập nhật trạng thái đơn hàng #" + order.getId() + " - SnackHub";
+        String subject = "Cập nhật trạng thái đơn hàng #" + order.getId() + " - SneakerHub";
         String htmlContent = """
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
                 <h2 style="color: %s; text-align: center;">Trạng thái: %s</h2>
@@ -306,7 +306,7 @@ public class EmailService {
                 </table>
                 
                 <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-                <p style="font-size: 12px; color: #999; text-align: center;">Đội ngũ SnackHub</p>
+                <p style="font-size: 12px; color: #999; text-align: center;">Đội ngũ SneakerHub</p>
             </div>
         """.formatted(
             color, statusText, 
@@ -320,7 +320,7 @@ public class EmailService {
 
     // 5. Email thông báo hủy 1 sản phẩm cụ thể
     public void sendItemCancellationNotice(String email, Order order, com.dongphuckhanh.ltw2.entity.OrderDetail deletedItem, String reason) {
-        String subject = "Thông báo hủy 1 sản phẩm trong đơn hàng #" + order.getId() + " - SnackHub";
+        String subject = "Thông báo hủy 1 sản phẩm trong đơn hàng #" + order.getId() + " - SneakerHub";
         
         java.util.Map<String, String> inlineImages = new java.util.HashMap<>();
         String imgName = deletedItem.getProduct().getImage();
@@ -361,9 +361,9 @@ public class EmailService {
                 </div>
                 
                 <p>Các sản phẩm còn lại trong đơn hàng của bạn vẫn sẽ được giao đến bạn bình thường. Số tiền tương ứng của sản phẩm bị hủy sẽ được hoàn lại hoặc cấn trừ vào tổng thanh toán khi nhận hàng.</p>
-                <p>Rất xin lỗi bạn vì sự bất tiện này. Cảm ơn bạn đã thông cảm và đồng hành cùng SnackHub!</p>
+                <p>Rất xin lỗi bạn vì sự bất tiện này. Cảm ơn bạn đã thông cảm và đồng hành cùng SneakerHub!</p>
                 <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-                <p style="font-size: 12px; color: #999; text-align: center;">Đội ngũ SnackHub</p>
+                <p style="font-size: 12px; color: #999; text-align: center;">Đội ngũ SneakerHub</p>
             </div>
         """.formatted(
             order.getDeliveryName(), order.getId(),
@@ -376,15 +376,15 @@ public class EmailService {
 
     // 6. Email cảm ơn khách hàng gửi form liên hệ
     public void sendContactThankYou(String email, String customerName) {
-        String subject = "SnackHub đã nhận được tin nhắn của bạn!";
+        String subject = "SneakerHub đã nhận được tin nhắn của bạn!";
         String htmlContent = """
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
                 <h2 style="color: #ff6b6b; text-align: center;">Cảm ơn bạn đã liên hệ!</h2>
                 <p>Chào <b>%s</b>,</p>
-                <p>Chúng tôi đã nhận được thông tin liên hệ của bạn. Đội ngũ chăm sóc khách hàng của SnackHub sẽ xem xét và phản hồi bạn trong thời gian sớm nhất (thông thường trong vòng 24 giờ làm việc).</p>
-                <p>Trong lúc chờ đợi, bạn có thể tham quan các món ăn vặt hấp dẫn đang có trên website của chúng tôi.</p>
+                <p>Chúng tôi đã nhận được thông tin liên hệ của bạn. Đội ngũ chăm sóc khách hàng của SneakerHub sẽ xem xét và phản hồi bạn trong thời gian sớm nhất (thông thường trong vòng 24 giờ làm việc).</p>
+                <p>Trong lúc chờ đợi, bạn có thể tham quan những đôi giày hấp dẫn đang có trên website của chúng tôi.</p>
                 <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-                <p style="font-size: 12px; color: #999; text-align: center;">Đội ngũ SnackHub</p>
+                <p style="font-size: 12px; color: #999; text-align: center;">Đội ngũ SneakerHub</p>
             </div>
         """.formatted(customerName);
         sendHtmlEmail(email, subject, htmlContent);
@@ -430,7 +430,7 @@ public class EmailService {
                 </div>
                 
                 <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-                <p style="font-size: 12px; color: #999; text-align: center;">Hệ thống tự động SnackHub</p>
+                <p style="font-size: 12px; color: #999; text-align: center;">Hệ thống tự động SneakerHub</p>
             </div>
         """.formatted(
             contact.getName(), 

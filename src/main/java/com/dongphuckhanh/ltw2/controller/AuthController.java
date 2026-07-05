@@ -140,6 +140,7 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setEmail(registerRequest.getEmail());
         user.setPhone(registerRequest.getPhone());
+        user.setAddress(registerRequest.getAddress());
         user.setGender(registerRequest.getGender());
         user.setRoles("ROLE_USER"); // Mặc định tất cả user mới là ROLE_USER
         user.setStatus(0); // Chưa kích hoạt

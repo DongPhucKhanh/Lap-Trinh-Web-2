@@ -7,6 +7,8 @@ import com.dongphuckhanh.ltw2.repository.OrderDetailRepository;
 import com.dongphuckhanh.ltw2.repository.OrderRepository;
 import com.dongphuckhanh.ltw2.repository.ProductRepository;
 import com.dongphuckhanh.ltw2.repository.UserRepository;
+import com.dongphuckhanh.ltw2.repository.VoucherRepository;
+import com.dongphuckhanh.ltw2.entity.Voucher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +35,9 @@ public class OrderController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private VoucherRepository voucherRepository;
 
     @Autowired
     private EmailService emailService;
@@ -113,6 +118,17 @@ public class OrderController {
         String paymentMethod = (String) payload.get("paymentMethod");
         order.setPaymentMethod(paymentMethod);
 
+        // --- Voucher info (để lưu sau khi tính tổng tiền) ---
+        String voucherCode = (String) payload.get("voucherCode");
+        Voucher appliedVoucher = null;
+        if (voucherCode != null && !voucherCode.trim().isEmpty()) {
+            Optional<Voucher> optVoucher = voucherRepository.findByCode(voucherCode);
+            if (optVoucher.isPresent()) {
+                appliedVoucher = optVoucher.get();
+                order.setVoucherCode(voucherCode);
+            }
+        }
+
         // --- Lưu Order trước để có ID ---
         Order savedOrder = orderRepository.save(order);
 
@@ -124,6 +140,8 @@ public class OrderController {
         }
 
         List<OrderDetail> detailList = new ArrayList<>();
+        BigDecimal totalOrderAmount = BigDecimal.ZERO;
+
         for (Object rawItem : rawItems) {
             Map<?, ?> item = (Map<?, ?>) rawItem;
 
@@ -165,9 +183,29 @@ public class OrderController {
             detail.setDiscount(discount);
             // amount sẽ được tính tự động bởi @PrePersist trong OrderDetail
             detailList.add(detail);
+
+            totalOrderAmount = totalOrderAmount.add(price.multiply(new BigDecimal(qty)));
         }
 
         orderDetailRepository.saveAll(detailList);
+
+        // --- Áp dụng Mã khuyến mãi và cập nhật DB ---
+        if (appliedVoucher != null && appliedVoucher.getStatus() == 1) {
+            double total = totalOrderAmount.doubleValue();
+            if (appliedVoucher.getMinOrderValue() == null || total >= appliedVoucher.getMinOrderValue()) {
+                double discountAmount = total * (appliedVoucher.getDiscountPercent() / 100.0);
+                if (appliedVoucher.getMaxDiscountAmount() != null && discountAmount > appliedVoucher.getMaxDiscountAmount()) {
+                    discountAmount = appliedVoucher.getMaxDiscountAmount();
+                }
+                
+                savedOrder.setDiscountAmount(discountAmount);
+                orderRepository.save(savedOrder);
+                
+                // Tăng số lượt sử dụng
+                appliedVoucher.setUsedCount((appliedVoucher.getUsedCount() == null ? 0 : appliedVoucher.getUsedCount()) + 1);
+                voucherRepository.save(appliedVoucher);
+            }
+        }
 
         // Gửi email xác nhận đơn hàng
         if (savedOrder.getDeliveryEmail() != null && !savedOrder.getDeliveryEmail().isBlank()) {

@@ -79,7 +79,9 @@ public class SecurityConfig {
                     "/swagger-ui/**",        // Swagger UI
                     "/swagger-ui.html",
                     "/v3/api-docs/**",       // OpenAPI JSON
-                    "/api-docs/**"
+                    "/api-docs/**",
+                    "/api/chat/**",          // AI Chat
+                    "/api/chat"
                 ).permitAll()
 
                 // --- KHÁCH VÃNG LAI chỉ được GET ---

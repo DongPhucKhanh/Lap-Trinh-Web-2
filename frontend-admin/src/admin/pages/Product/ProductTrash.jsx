@@ -56,7 +56,7 @@ const ProductTrash = () => {
               <tr>
                 <th>ID</th>
                 <th>Hình ảnh</th>
-                <th>Tên món</th>
+                <th>Tên sản phẩm</th>
                 <th>Giá bán</th>
                 <th>Danh mục</th>
                 <th>Thao tác</th>

@@ -57,6 +57,12 @@ public class User {
     @Column(length = 255)
     private String avatar;
 
+    @Column(columnDefinition = "TEXT")
+    private String adminNote;
+
+    @org.hibernate.annotations.Formula("(SELECT COUNT(o.id) FROM `order` o WHERE o.user_id = id)")
+    private Integer orderCount;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 

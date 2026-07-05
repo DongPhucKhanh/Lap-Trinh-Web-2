@@ -243,7 +243,7 @@
 }
 
 .admin-table th, .admin-table td {
-  padding: 1rem 1.5rem;
+  padding: 1rem 0.75rem; /* Giảm padding để bảng gọn hơn */
   text-align: left;
   border-bottom: 1px solid var(--border);
 }
@@ -255,6 +255,7 @@
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap; /* Ngăn chữ trên tiêu đề bị rớt dòng */
 }
 
 .admin-table tr:hover td {
@@ -375,7 +376,7 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   padding: 2rem;
-  max-width: 800px;
+  max-width: 100%;
 }
 
 .form-group select {
@@ -405,3 +406,887 @@
 }
 .badge-success { background: #d1fae5; color: #059669; }
 .badge-secondary { background: #f1f5f9; color: #475569; }
+
+/* ================= Voucher Page UI ================= */
+.voucher-page {
+  font-family: 'Inter', sans-serif;
+}
+.voucher-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.title-italic {
+  font-style: italic;
+  font-weight: 900;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  font-size: 2rem;
+  margin: 0;
+}
+.btn-voucher-create {
+  background: #ff3333;
+  color: white;
+  font-style: italic;
+  font-weight: 800;
+  border-radius: 50px;
+  padding: 0.8rem 1.5rem;
+  text-decoration: none;
+  transition: 0.2s;
+  box-shadow: 0 4px 14px rgba(255, 51, 51, 0.4);
+}
+.btn-voucher-create:hover {
+  background: #e60000;
+  color: white;
+  transform: translateY(-2px);
+}
+.voucher-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.voucher-table th, .voucher-table td {
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+.voucher-table th {
+  background: #fff4f4;
+  color: #ff6b6b;
+  font-style: italic;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-align: left;
+}
+.voucher-title {
+  font-weight: 800;
+  font-style: italic;
+  color: #0f172a;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+.voucher-code {
+  color: #94a3b8;
+  font-style: italic;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.code-text {
+  color: #ef4444;
+  font-weight: 800;
+}
+.voucher-discount {
+  color: #3b82f6;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+}
+.voucher-min-order {
+  color: #94a3b8;
+  font-style: italic;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.voucher-usage {
+  color: #0f172a;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+.badge-voucher {
+  padding: 0.5rem 1.2rem;
+  border-radius: 50px;
+  font-style: italic;
+  font-weight: 900;
+  font-size: 0.75rem;
+  display: inline-block;
+  text-transform: uppercase;
+}
+.badge-voucher.active {
+  color: #10b981;
+  background: #d1fae5;
+}
+.badge-voucher.expired {
+  color: #ef4444;
+  background: #fee2e2;
+}
+.btn-voucher-action {
+  padding: 0.4rem 1.2rem;
+  border-radius: 50px;
+  font-style: italic;
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: inline-block;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  margin-left: 0.5rem;
+  transition: opacity 0.2s;
+}
+.btn-voucher-action.edit {
+  color: #3b82f6;
+  background: #dbeafe;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* ================= Loader ================= */
+.loader {
+  border: 3px solid rgba(0,0,0,0.05);
+  border-top: 3px solid var(--primary);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin: 3rem auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.text-center { text-align: center; }
+.py-4 { padding-top: 2rem; padding-bottom: 2rem; }
+
+/* ================= Utilities & Forms ================= */
+.flex-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.card-panel {
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 2rem;
+  max-width: 100%;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  background: white;
+  font-family: inherit;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.badge-success { background: #d1fae5; color: #059669; }
+.badge-secondary { background: #f1f5f9; color: #475569; }
+
+/* ================= Voucher Page UI ================= */
+.voucher-page {
+  font-family: 'Inter', sans-serif;
+}
+.voucher-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.title-italic {
+  font-style: italic;
+  font-weight: 900;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  font-size: 2rem;
+  margin: 0;
+}
+.btn-voucher-create {
+  background: #ff3333;
+  color: white;
+  font-style: italic;
+  font-weight: 800;
+  border-radius: 50px;
+  padding: 0.8rem 1.5rem;
+  text-decoration: none;
+  transition: 0.2s;
+  box-shadow: 0 4px 14px rgba(255, 51, 51, 0.4);
+}
+.btn-voucher-create:hover {
+  background: #e60000;
+  color: white;
+  transform: translateY(-2px);
+}
+.voucher-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.voucher-table th, .voucher-table td {
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+.voucher-table th {
+  background: #fff4f4;
+  color: #ff6b6b;
+  font-style: italic;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-align: left;
+}
+.voucher-title {
+  font-weight: 800;
+  font-style: italic;
+  color: #0f172a;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+.voucher-code {
+  color: #94a3b8;
+  font-style: italic;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.code-text {
+  color: #ef4444;
+  font-weight: 800;
+}
+.voucher-discount {
+  color: #3b82f6;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+}
+.voucher-min-order {
+  color: #94a3b8;
+  font-style: italic;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.voucher-usage {
+  color: #0f172a;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 1.1rem;
+}
+.badge-voucher {
+  padding: 0.5rem 1.2rem;
+  border-radius: 50px;
+  font-style: italic;
+  font-weight: 900;
+  font-size: 0.75rem;
+  display: inline-block;
+  text-transform: uppercase;
+}
+.badge-voucher.active {
+  color: #10b981;
+  background: #d1fae5;
+}
+.badge-voucher.expired {
+  color: #ef4444;
+  background: #fee2e2;
+}
+.btn-voucher-action {
+  padding: 0.4rem 1.2rem;
+  border-radius: 50px;
+  font-style: italic;
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: inline-block;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  margin-left: 0.5rem;
+  transition: opacity 0.2s;
+}
+.btn-voucher-action.edit {
+  color: #3b82f6;
+  background: #dbeafe;
+}
+.btn-voucher-action.delete {
+  color: #ef4444;
+  background: #fee2e2;
+}
+.btn-voucher-action:hover {
+  opacity: 0.8;
+}
+
+/* ================= Banner Grid UI ================= */
+.banner-grid-container {
+  padding: 1rem 0;
+}
+.banner-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+@media (max-width: 1024px) {
+  .banner-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.banner-card {
+  background: white;
+  border-radius: 30px;
+  border: 1px solid #f1f5f9;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+.banner-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 45px -10px rgba(0,0,0,0.1);
+}
+.banner-img-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  aspect-ratio: 21/9;
+}
+.banner-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.banner-card:hover .banner-img {
+  transform: scale(1.03);
+}
+.banner-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0.5rem;
+}
+.banner-name {
+  font-weight: 900;
+  font-style: italic;
+  color: #1e293b;
+  text-transform: uppercase;
+  font-size: 1.1rem;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+.btn-banner-edit {
+  background: #f0f7ff;
+  color: #2563eb;
+  font-weight: 800;
+  padding: 0.6rem 1.5rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  text-decoration: none;
+  transition: 0.2s;
+  text-transform: uppercase;
+}
+.btn-banner-edit:hover {
+  background: #dbeafe;
+}
+.add-new-card {
+  border: 2px dashed #e2e8f0;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  min-height: 250px;
+  box-shadow: none;
+}
+.add-new-card:hover {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+  transform: none;
+  box-shadow: none;
+}
+.add-icon-wrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cbd5e1;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+  transition: 0.3s;
+}
+.add-new-card:hover .add-icon-wrapper {
+  transform: scale(1.1);
+  color: #94a3b8;
+}
+.add-text {
+  color: #64748b;
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 1px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+.btn-banner-delete {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+  opacity: 0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.banner-card:hover .btn-banner-delete {
+  opacity: 1;
+}
+.btn-banner-delete:hover {
+  background: #ef4444;
+  color: white;
+}
+
+/* ================= Post Grid UI ================= */
+.post-grid-container {
+  padding: 1rem 0;
+}
+.post-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+@media (max-width: 1200px) {
+  .post-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 768px) {
+  .post-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.post-card {
+  background: white;
+  border-radius: 20px;
+  border: 1px solid #f1f5f9;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+.post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1);
+}
+.post-img-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 16/9;
+}
+.post-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.post-card:hover .post-img {
+  transform: scale(1.05);
+}
+.post-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: white;
+  color: #2563eb;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 0.7rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+.post-info {
+  padding: 0 0.5rem;
+}
+.post-name {
+  font-weight: 800;
+  font-style: italic;
+  color: #0f172a;
+  font-size: 1.1rem;
+  margin: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.post-actions-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  opacity: 0;
+  transition: 0.3s;
+  z-index: 20;
+}
+.post-card:hover .post-actions-overlay {
+  opacity: 1;
+}
+.post-action-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transform: translateY(10px);
+}
+.post-card:hover .post-action-btn {
+  transform: translateY(0);
+}
+.post-action-btn:hover {
+  transform: scale(1.1) !important;
+}
+.post-action-btn.view { color: #10b981; }
+.post-action-btn.edit { color: #3b82f6; }
+.post-action-btn.delete { color: #ef4444; }
+
+/* ================= Contact Chat UI ================= */
+.chat-container {
+  display: flex;
+  height: 100%;
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  margin-top: 1rem;
+}
+.chat-sidebar {
+  width: 350px;
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+}
+.chat-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: white;
+}
+.chat-header h3 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+.chat-list {
+  flex: 1;
+  overflow-y: auto;
+}
+.chat-list-item {
+  display: flex;
+  padding: 1.2rem;
+  gap: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: 0.2s;
+  position: relative;
+  background: white;
+}
+.chat-list-item:hover {
+  background: #f1f5f9;
+}
+.chat-list-item.active {
+  background: #eff6ff;
+  border-left: 4px solid #3b82f6;
+}
+.chat-list-item.unread .chat-subject {
+  font-weight: 700;
+  color: #0f172a;
+}
+.chat-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  flex-shrink: 0;
+}
+.chat-list-item.active .chat-avatar {
+  background: #bfdbfe;
+  color: #1d4ed8;
+}
+.chat-preview {
+  flex: 1;
+  min-width: 0;
+}
+.chat-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.25rem;
+}
+.chat-preview-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-time {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+.chat-subject {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.9rem;
+  color: #475569;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-snippet {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-delete-btn {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  opacity: 0;
+  transition: 0.2s;
+  padding: 0.2rem;
+}
+.chat-list-item:hover .chat-delete-btn {
+  opacity: 1;
+}
+
+.chat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+.chat-content-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.chat-back-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+}
+.chat-contact-info h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.2rem;
+}
+.chat-contact-info p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+.chat-status-badge {
+  margin-left: auto;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: #f8fafc;
+}
+.message-bubble {
+  max-width: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.message-bubble.customer {
+  align-self: flex-start;
+}
+.message-bubble.admin {
+  align-self: flex-end;
+}
+.message-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+.message-bubble.admin .message-meta {
+  justify-content: flex-end;
+}
+.message-sender {
+  font-weight: 700;
+  color: #475569;
+}
+.message-time {
+  color: #94a3b8;
+}
+.message-box {
+  padding: 1.2rem;
+  border-radius: 16px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+.message-bubble.customer .message-box {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-top-left-radius: 4px;
+}
+.message-bubble.admin .message-box {
+  background: #eff6ff;
+  color: #0f172a;
+  border: 1px solid #bfdbfe;
+  border-top-right-radius: 4px;
+}
+
+.chat-input-area {
+  padding: 1.5rem;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  gap: 1rem;
+}
+.chat-textarea {
+  flex: 1;
+  resize: none;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 1rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  height: 80px;
+  outline: none;
+  transition: 0.2s;
+}
+.chat-textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+.chat-send-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.chat-send-btn:hover:not(:disabled) {
+  background: #2563eb;
+}
+.chat-send-btn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.chat-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #64748b;
+  text-align: center;
+  padding: 2rem;
+}
+.empty-icon-wrapper {
+  width: 100px;
+  height: 100px;
+  background: #f1f5f9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  color: #cbd5e1;
+}
+
+@media (max-width: 992px) {
+  .chat-sidebar {
+    width: 100%;
+  }
+  .mobile-hidden {
+    display: none !important;
+  }
+  .chat-back-btn {
+    display: block;
+  }
+}

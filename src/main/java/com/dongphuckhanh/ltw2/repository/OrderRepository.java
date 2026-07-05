@@ -34,12 +34,12 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Long countByStatus(Integer status);
 
     /**
-     * Tính tổng doanh thu trong khoảng thời gian (chỉ tính đơn đã giao thành công - status = 3).
+     * Tính tổng doanh thu trong khoảng thời gian (tính các đơn đã giao hoặc hoàn thành - status 4, 5).
      */
     @Query("""
             SELECT COALESCE(SUM(od.amount), 0)
             FROM OrderDetail od
-            WHERE od.order.status = 3
+            WHERE od.order.status IN (4, 5)
               AND od.order.createdAt BETWEEN :startDate AND :endDate
             """)
     BigDecimal calculateRevenue(@Param("startDate") LocalDateTime startDate,

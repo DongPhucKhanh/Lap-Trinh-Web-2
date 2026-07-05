@@ -33,41 +33,55 @@ const PostList = () => {
         <h2><FileText /> Quản Lý Post</h2>
         <Link to="/admin/post/create" className="btn-primary"><Plus size={18} /> Thêm Mới</Link>
       </div>
-      <div className="table-container">
+      <div className="post-grid-container">
         {loading ? <div className="loader"></div> : (
-          <>
-          <table className="admin-table">
-            <thead><tr><th>ID</th><th>Hình ảnh</th><th>Thông tin</th><th>Thao tác</th></tr></thead>
-            <tbody>
-              {paginatedData.map(item => (
-                <tr key={item.id}>
-                  <td>#{item.id}</td>
-                  <td>
-                    {item.image ? (
-                      <img src={item.image.startsWith('http') ? item.image : `http://localhost:8080/uploads/${item.image}`} alt="post" style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
-                    ) : (
-                      <div style={{ width: '50px', height: '50px', backgroundColor: '#e9ecef', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#6c757d' }}>Trống</div>
-                    )}
-                  </td>
-                  <td>{item.name || item.title || item.username || item.fullname || 'No Data'}</td>
-                  <td>
-                    <div className="action-btns">
-                      <Link to={'/admin/post/show/' + item.id} className="btn-icon text-green"><Eye size={18}/></Link>
-                      <Link to={'/admin/post/edit/' + item.id} className="btn-icon text-blue"><Edit size={18}/></Link>
-                      <button className="btn-icon text-red" onClick={() => handleDelete(item.id)}><Trash2 size={18}/></button>
+          <div className="post-grid">
+            {paginatedData.map(item => {
+              const imageUrl = item.image ? (item.image.startsWith('http') ? item.image : `http://localhost:8080/uploads/${item.image}`) : 'https://via.placeholder.com/400x250';
+              const topicName = item.topic?.name || 'TIN TỨC';
+              return (
+                <div key={item.id} className="post-card">
+                  <div className="post-img-wrapper">
+                    <img src={imageUrl} alt="post" className="post-img" />
+                    <span className="post-badge">{topicName}</span>
+                    
+                    <div className="post-actions-overlay">
+                      <Link to={`/admin/post/show/${item.id}`} className="post-action-btn view" title="Xem chi tiết">
+                        <Eye size={16} />
+                      </Link>
+                      <Link to={`/admin/post/edit/${item.id}`} className="post-action-btn edit" title="Chỉnh sửa">
+                        <Edit size={16} />
+                      </Link>
+                      <button className="post-action-btn delete" onClick={() => handleDelete(item.id)} title="Xóa">
+                        <Trash2 size={16} />
+                      </button>
                     </div>
-                  </td>
-                </tr>
-              ))}
-              {data.length === 0 && <tr><td colSpan="4" className="text-center py-4">Chưa có dữ liệu.</td></tr>}
-            </tbody>
-          </table>
-          <Pagination 
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-          </>
+                  </div>
+                  <div className="post-info">
+                    <h3 className="post-name">{item.title || item.name || 'Bài viết không có tiêu đề'}</h3>
+                  </div>
+                </div>
+              );
+            })}
+            
+            {/* Add New Card */}
+            <Link to="/admin/post/create" className="post-card add-new-card">
+              <div className="add-icon-wrapper">
+                <Plus size={32} className="add-icon" />
+              </div>
+              <span className="add-text">THÊM BÀI VIẾT MỚI</span>
+            </Link>
+          </div>
+        )}
+        
+        {!loading && totalPages > 1 && (
+          <div className="mt-4">
+            <Pagination 
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
         )}
       </div>
     </div>

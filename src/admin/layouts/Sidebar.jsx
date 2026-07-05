@@ -55,6 +55,7 @@ const Sidebar = () => {
     { path: '/admin/banner', icon: <Image size={20} />, label: 'Banner' },
     { path: '/admin/post', icon: <FileText size={20} />, label: 'Bài Viết' },
     { path: '/admin/topic', icon: <MessageSquare size={20} />, label: 'Chủ Đề' },
+    { path: '/admin/vouchers', icon: <Tag size={20} />, label: 'Khuyến Mãi' },
     { path: '/admin/contact', icon: <MessageSquare size={20} />, label: 'Liên Hệ' },
     { path: '/admin/user', icon: <Users size={20} />, label: 'Người Dùng' },
     { path: '/admin/menu', icon: <Menu size={20} />, label: 'Menu' },

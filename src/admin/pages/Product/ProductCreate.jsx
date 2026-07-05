@@ -280,7 +280,7 @@ const ProductCreate = () => {
           
           <h3 style={{borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '20px', color: 'var(--primary)'}}>1. Thông tin cơ bản</h3>
           <div className="form-group">
-            <label>Tên món ăn <span className="text-red">*</span></label>
+            <label>Tên sản phẩm <span className="text-red">*</span></label>
             <input required type="text" value={formData.name} onChange={handleNameChange} />
           </div>
           

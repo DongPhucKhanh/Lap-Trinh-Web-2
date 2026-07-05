@@ -12,6 +12,7 @@ const UserCreate = () => {
     name: '', 
     email: '', 
     phone: '', 
+    address: '',
     roles: 'ROLE_ADMIN', 
     status: 1 
   });
@@ -60,6 +61,10 @@ const UserCreate = () => {
             <div className="form-group">
               <label>Số điện thoại</label>
               <input type="text" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="0987..." />
+            </div>
+            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+              <label>Địa chỉ</label>
+              <input type="text" value={formData.address || ''} onChange={e => setFormData({...formData, address: e.target.value})} placeholder="Nhập địa chỉ..." />
             </div>
             <div className="form-group">
               <label>Quyền (Role)</label>

@@ -147,18 +147,19 @@ const InventoryModal = ({ product, isOpen, onClose, onSave }) => {
                   <td colSpan="5" style={{ textAlign: 'center', padding: '20px', color: '#6b7280', fontStyle: 'italic' }}>Chưa có biến thể nào.</td>
                 </tr>
               ) : (
-                variants.map(v => (
+                variants.map(v => {
+                  let firstVariantImg = v.image && v.image !== 'null' ? v.image.split(',')[0].trim() : '';
+                  const displayImg = (firstVariantImg && firstVariantImg !== '') ? firstVariantImg : product.image;
+                  
+                  return (
                   <tr key={v.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
                     <td style={{ padding: '10px' }}>
-                      {v.image ? (
-                        <img 
-                          src={v.image.startsWith('http') ? v.image : `http://localhost:8080/uploads/${v.image}`} 
-                          alt={v.color} 
-                          style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} 
-                        />
-                      ) : (
-                        <div style={{ width: '40px', height: '40px', backgroundColor: '#f0f0f0', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#999' }}>N/A</div>
-                      )}
+                      <img 
+                        src={displayImg ? (displayImg.startsWith('http') ? displayImg : `http://localhost:8080/uploads/${displayImg}`) : 'https://placehold.co/40x40/f1f5f9/94a3b8?text=Img'} 
+                        alt={v.color} 
+                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/40x40/f1f5f9/94a3b8?text=Img'; }}
+                        style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #e2e8f0' }} 
+                      />
                     </td>
                     <td style={{ padding: '10px', fontWeight: 'bold' }}>{v.color}</td>
                     <td style={{ padding: '10px' }}>{v.size}</td>
@@ -169,7 +170,8 @@ const InventoryModal = ({ product, isOpen, onClose, onSave }) => {
                       </button>
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
               </tbody>
             </table>

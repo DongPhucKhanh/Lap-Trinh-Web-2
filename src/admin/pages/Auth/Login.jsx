@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { User, Lock, ShieldAlert, LogIn } from 'lucide-react';
+import './Login.css';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -13,15 +15,11 @@ const Login = () => {
     setLoading(true);
     setError('');
 
-    // Gọi trực tiếp axios vì api.js có interceptor tự gắn token cũ
     axios.post('http://localhost:8080/api/auth/login', formData)
       .then(res => {
         setLoading(false);
-        // Lưu token vào localStorage
         localStorage.setItem('adminToken', res.data.token);
         localStorage.setItem('adminInfo', JSON.stringify(res.data));
-        
-        // Điều hướng vào dashboard
         navigate('/admin');
       })
       .catch(err => {
@@ -31,44 +29,83 @@ const Login = () => {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f8fafc' }}>
-      <div className="card-panel" style={{ width: '400px' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Admin Login</h2>
+    <div className="admin-login-container">
+      {/* Animated Background Shapes */}
+      <div className="bg-shape bg-shape-1"></div>
+      <div className="bg-shape bg-shape-2"></div>
+      <div className="bg-shape bg-shape-3"></div>
+
+      <div className="login-glass-card">
+        <div className="login-header">
+          <div className="login-logo">
+            <ShieldAlert size={32} color="white" />
+          </div>
+          <h2 className="login-title">Hệ Thống Quản Trị</h2>
+          <p className="login-subtitle">Vui lòng đăng nhập để tiếp tục</p>
+        </div>
         
-        {error && <div style={{ background: '#fee2e2', color: '#ef4444', padding: '10px', borderRadius: '4px', marginBottom: '15px' }}>{error}</div>}
+        {error && (
+          <div className="login-error">
+            <ShieldAlert size={18} />
+            <span>{error}</span>
+          </div>
+        )}
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Username</label>
-            <input 
-              required 
-              type="text" 
-              value={formData.username} 
-              onChange={e => setFormData({...formData, username: e.target.value})} 
-              placeholder="Nhập tên đăng nhập..."
-              style={{ width: '100%', padding: '10px', marginTop: '5px' }}
-            />
+            <label>Tài khoản (Username)</label>
+            <div className="input-wrapper">
+              <input 
+                required 
+                type="text" 
+                className="glass-input"
+                value={formData.username} 
+                onChange={e => setFormData({...formData, username: e.target.value})} 
+                placeholder="Nhập tên đăng nhập..."
+              />
+              <User className="input-icon" size={18} />
+            </div>
           </div>
           
-          <div className="form-group" style={{ marginTop: '15px' }}>
-            <label>Password</label>
-            <input 
-              required 
-              type="password" 
-              value={formData.password} 
-              onChange={e => setFormData({...formData, password: e.target.value})} 
-              placeholder="Nhập mật khẩu..."
-              style={{ width: '100%', padding: '10px', marginTop: '5px' }}
-            />
+          <div className="form-group">
+            <label>Mật khẩu (Password)</label>
+            <div className="input-wrapper">
+              <input 
+                required 
+                type="password" 
+                className="glass-input"
+                value={formData.password} 
+                onChange={e => setFormData({...formData, password: e.target.value})} 
+                placeholder="Nhập mật khẩu..."
+              />
+              <Lock className="input-icon" size={18} />
+            </div>
+          </div>
+
+          <div className="remember-forgot">
+            <label className="checkbox-wrapper">
+              <input type="checkbox" />
+              <span>Ghi nhớ đăng nhập</span>
+            </label>
+            <a href="#" className="forgot-link">Quên mật khẩu?</a>
           </div>
 
           <button 
             type="submit" 
-            className="btn-primary" 
-            style={{ width: '100%', marginTop: '20px', padding: '10px' }}
+            className="btn-login" 
             disabled={loading}
           >
-            {loading ? 'Đang xử lý...' : 'Đăng Nhập'}
+            {loading ? (
+              <>
+                <div className="spinner"></div>
+                Đang kết nối...
+              </>
+            ) : (
+              <>
+                <LogIn size={20} />
+                Đăng Nhập
+              </>
+            )}
           </button>
         </form>
       </div>

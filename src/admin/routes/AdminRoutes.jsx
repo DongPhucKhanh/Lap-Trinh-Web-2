@@ -49,6 +49,11 @@ import PostEdit from '../pages/Post/PostEdit';
 import PostTrash from '../pages/Post/PostTrash';
 import PostShow from '../pages/Post/PostShow';
 
+// Voucher
+import VoucherList from '../pages/Voucher/VoucherList';
+import VoucherCreate from '../pages/Voucher/VoucherCreate';
+import VoucherEdit from '../pages/Voucher/VoucherEdit';
+
 // Topic
 import TopicList from '../pages/Topic/TopicList';
 import TopicCreate from '../pages/Topic/TopicCreate';
@@ -155,6 +160,11 @@ const AdminRoutes = () => {
           <Route path="create" element={<MenuCreate />} />
           <Route path="edit/:id" element={<MenuEdit />} />
         </Route>
+
+        {/* Vouchers */}
+        <Route path="vouchers" element={<VoucherList />} />
+        <Route path="vouchers/create" element={<VoucherCreate />} />
+        <Route path="vouchers/edit/:id" element={<VoucherEdit />} />
       </Route>
 
       {/* Redirects */}

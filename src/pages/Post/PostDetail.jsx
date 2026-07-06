@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Calendar, User, ArrowLeft, Share2 } from 'lucide-react';
+import { Calendar, User, ArrowLeft, Share2, Volume2, Pause, Play, Square } from 'lucide-react';
 import api from '../../services/api';
 import './Post.css';
 
@@ -10,6 +10,69 @@ const PostDetail = () => {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Voice Reader State
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    // Stop speech when component unmounts
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+  const handleReadAloud = () => {
+    if (!window.speechSynthesis) {
+      alert("Trình duyệt của bạn không hỗ trợ đọc văn bản.");
+      return;
+    }
+
+    if (isSpeaking) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      setIsPaused(false);
+      return;
+    }
+
+    // Extract text from HTML
+    const tempDiv = document.createElement("div");
+    tempDiv.innerHTML = post.detail || '';
+    const textToRead = `${post.title}. ${post.description || ''}. ${tempDiv.textContent || tempDiv.innerText || ""}`;
+
+    if (!textToRead.trim()) return;
+
+    const utterance = new SpeechSynthesisUtterance(textToRead);
+    utterance.lang = 'vi-VN'; // Vietnamese voice
+    utterance.rate = 1.15; // Hơi nhanh một chút cho giống anime
+    utterance.pitch = 1.8; // Tăng độ cao giọng lên mức 1.8 để tạo giọng nữ cao, dễ thương (anime)
+    
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      setIsPaused(false);
+    };
+    
+    utterance.onerror = () => {
+      setIsSpeaking(false);
+      setIsPaused(false);
+    };
+
+    window.speechSynthesis.speak(utterance);
+    setIsSpeaking(true);
+    setIsPaused(false);
+  };
+
+  const handlePauseResume = () => {
+    if (isPaused) {
+      window.speechSynthesis.resume();
+      setIsPaused(false);
+    } else {
+      window.speechSynthesis.pause();
+      setIsPaused(true);
+    }
+  };
 
   useEffect(() => {
     // First try to fetch all to find by slug, or if it's numeric fetch by ID
@@ -60,9 +123,29 @@ const PostDetail = () => {
           <div className="post-detail-header">
             <div className="topic-badge">{post.topic?.name || 'Tin Tức'}</div>
             <h1>{post.title}</h1>
-            <div className="post-meta-large">
-              <span className="meta-item"><Calendar size={16} /> {new Date(post.createdAt).toLocaleDateString('vi-VN')}</span>
-              <span className="meta-item"><User size={16} /> {post.createdBy || 'Admin'}</span>
+            <div className="post-meta-large" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div>
+                <span className="meta-item"><Calendar size={16} /> {new Date(post.createdAt).toLocaleDateString('vi-VN')}</span>
+                <span className="meta-item"><User size={16} /> {post.createdBy || 'Admin'}</span>
+              </div>
+              
+              <div className="voice-reader-controls">
+                {!isSpeaking ? (
+                  <button className="btn-voice" onClick={handleReadAloud}>
+                    <Volume2 size={16} /> Nghe bài viết
+                  </button>
+                ) : (
+                  <div className="voice-active-controls">
+                    <button className="btn-voice active" onClick={handlePauseResume}>
+                      {isPaused ? <Play size={16} /> : <Pause size={16} />} 
+                      {isPaused ? ' Tiếp tục' : ' Tạm dừng'}
+                    </button>
+                    <button className="btn-voice stop" onClick={handleReadAloud}>
+                      <Square size={16} /> Dừng
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

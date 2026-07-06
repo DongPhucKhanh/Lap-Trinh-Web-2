@@ -23,6 +23,7 @@ import VerifyAccount from '../pages/Auth/VerifyAccount';
 import Profile from '../pages/Profile/Profile';
 import Settings from '../pages/Profile/Settings';
 import Wishlist from '../pages/Profile/Wishlist';
+import ContactHistory from '../pages/Profile/ContactHistory';
 import Contact from '../pages/Contact/Contact';
 import About from '../pages/About/About';
 import PostList from '../pages/Post/PostList';
@@ -33,15 +34,18 @@ import PolicyPage from '../pages/Policy/PolicyPage';
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* Payment Gateway - standalone, không có Header/Footer */}
+      <Route path="payment-gateway" element={<PaymentGateway />} />
+
       <Route path="/" element={<MainLayout />}>
         <Route index element={<Home />} />
         <Route path="product" element={<ProductList />} />
+        <Route path="sale" element={<ProductList isSalePage={true} />} />
         <Route path="product/:id" element={<ProductDetail />} />
         <Route path="category/:id" element={<CategoryPage />} />
         <Route path="cart" element={<Cart />} />
         <Route path="checkout" element={<Checkout />} />
         <Route path="payment-result" element={<PaymentResult />} />
-        <Route path="payment-gateway" element={<PaymentGateway />} />
         <Route path="contact" element={<Contact />} />
         <Route path="about" element={<About />} />
         <Route path="post" element={<PostList />} />
@@ -59,6 +63,7 @@ const AppRoutes = () => {
         <Route path="wishlist" element={<Wishlist />} />
         <Route path="order" element={<OrderHistory />} />
         <Route path="order/:id" element={<OrderDetail />} />
+        <Route path="contact-history" element={<ContactHistory />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

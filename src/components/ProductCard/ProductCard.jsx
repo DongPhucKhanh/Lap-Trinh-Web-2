@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import api from '../../services/api';
 import './ProductCard.css';
 import QuickViewModal from './QuickViewModal';
+import AnimatedHeart from '../AnimatedHeart/AnimatedHeart';
 
 const ProductCard = ({ product, layout = 'grid', isFavorite, onToggleFavorite, onQuickView }) => {
   const { addToCart, cart } = useContext(CartContext);
@@ -113,13 +114,14 @@ const ProductCard = ({ product, layout = 'grid', isFavorite, onToggleFavorite, o
         
         {/* Overlay Actions */}
         <div className="product-overlay-actions">
-          <button 
-            className="action-btn"
-            onClick={(e) => { e.preventDefault(); onToggleFavorite && onToggleFavorite(product); }}
-            title={isFavorite ? "Bỏ yêu thích" : "Yêu thích"}
-          >
-            <Heart size={18} fill={isFavorite ? "#ef4444" : "none"} color={isFavorite ? "#ef4444" : "currentColor"} />
-          </button>
+          <div className="action-btn" style={{ padding: 0 }}>
+            <AnimatedHeart 
+              checked={isFavorite} 
+              onChange={() => onToggleFavorite && onToggleFavorite(product)} 
+              width="24px" 
+              height="24px" 
+            />
+          </div>
           
           <button 
             className="action-btn"

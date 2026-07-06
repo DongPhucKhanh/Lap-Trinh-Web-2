@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Outlet, Navigate, useLocation, Link } from 'react-router-dom';
-import { User, FileText, Settings, LogOut, Heart } from 'lucide-react';
+import { User, FileText, Settings, LogOut, Heart, MessageSquare } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import Header from '../components/Header/Header';
 import Footer from '../components/Footer/Footer';
@@ -29,6 +29,7 @@ const UserLayout = () => {
     { path: '/user/profile', name: 'Hồ sơ cá nhân', icon: <User size={20} /> },
     { path: '/user/wishlist', name: 'Sản phẩm yêu thích', icon: <Heart size={20} /> },
     { path: '/user/order', name: 'Đơn mua của tôi', icon: <FileText size={20} /> },
+    { path: '/user/contact-history', name: 'Lịch sử hỗ trợ', icon: <MessageSquare size={20} /> },
     { path: '/user/settings', name: 'Cài đặt tài khoản', icon: <Settings size={20} /> },
   ];
 

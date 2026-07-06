@@ -200,7 +200,14 @@ const OrderDetail = () => {
                 </div>
                 <div className="item-info" style={{ flexGrow: 1, marginLeft: '1rem' }}>
                   <h4 style={{fontSize: '1.05rem', marginBottom: '0.25rem'}}>{detail.product?.name || 'Sản phẩm'}</h4>
-                  <p style={{color: '#64748b'}}>Số lượng: {detail.qty}</p>
+                  {(detail.variantColor || detail.variantSize) && (
+                    <p style={{color: '#64748b', marginBottom: '0.2rem', fontSize: '0.9rem'}}>
+                      Phân loại: {detail.variantColor && <span>{detail.variantColor}</span>} 
+                      {detail.variantColor && detail.variantSize && <span> - </span>}
+                      {detail.variantSize && <span>Size {detail.variantSize}</span>}
+                    </p>
+                  )}
+                  <p style={{color: '#64748b', fontSize: '0.9rem'}}>Số lượng: {detail.qty}</p>
                   {(order.status === 4 || order.status === 5) && (
                     <button 
                       className="btn-outline" 

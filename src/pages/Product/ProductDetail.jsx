@@ -17,6 +17,7 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('desc');
+  const [isDescExpanded, setIsDescExpanded] = useState(false);
   const [mainImgIndex, setMainImgIndex] = useState(0);
   const { addToCart, cart } = useContext(CartContext);
   const { user } = useContext(AuthContext);
@@ -101,16 +102,25 @@ const ProductDetail = () => {
       return false;
     }
 
-    if (variants.length > 0 && (!selectedColor || !selectedSize)) {
-      toast.warning('Vui lòng chọn màu sắc và kích cỡ!');
-      return false;
+    const hasColors = variants.some(v => v.color && v.color.trim() !== '');
+    const hasSizes = variants.some(v => (v.color || '') === (selectedColor || '') && v.size && v.size.trim() !== '');
+
+    if (variants.length > 0) {
+      if (hasColors && !selectedColor) {
+        toast.warning('Vui lòng chọn màu sắc!');
+        return false;
+      }
+      if (hasSizes && !selectedSize) {
+        toast.warning('Vui lòng chọn kích cỡ!');
+        return false;
+      }
     }
 
     let maxQty = product.productStore?.qty || 0;
     let variantId = null;
 
     if (variants.length > 0) {
-      const selectedVariant = variants.find(v => v.color === selectedColor && v.size === selectedSize);
+      const selectedVariant = variants.find(v => (v.color || '') === (selectedColor || '') && (v.size || '') === (selectedSize || ''));
       if (!selectedVariant || selectedVariant.qty <= 0) {
         toast.warning('Sản phẩm với lựa chọn này đã hết hàng!');
         return false;
@@ -361,7 +371,23 @@ const ProductDetail = () => {
           </div>
           <div className="tab-content">
             {activeTab === 'desc' && (
-              <div className="html-content" dangerouslySetInnerHTML={{ __html: product.detail || '<p>Đang cập nhật chi tiết sản phẩm.</p>' }} />
+              <div className="desc-container" style={{ position: 'relative' }}>
+                <div 
+                  className={`html-content ${!isDescExpanded ? 'collapsed' : ''}`} 
+                  dangerouslySetInnerHTML={{ __html: product.detail || '<p>Đang cập nhật chi tiết sản phẩm.</p>' }} 
+                />
+                {!isDescExpanded && (
+                  <div className="desc-fade-overlay" />
+                )}
+                <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+                  <button 
+                    className="btn-read-more-desc" 
+                    onClick={() => setIsDescExpanded(!isDescExpanded)}
+                  >
+                    {isDescExpanded ? 'Thu gọn' : 'Xem thêm'}
+                  </button>
+                </div>
+              </div>
             )}
             {activeTab === 'reviews' && (
               <div className="text-content">

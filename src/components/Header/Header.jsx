@@ -6,6 +6,7 @@ import { AuthContext } from '../../context/AuthContext';
 import CartDrawer from '../CartDrawer/CartDrawer';
 import api from '../../services/api';
 import './Header.css';
+import AnimatedHeart from '../AnimatedHeart/AnimatedHeart';
 
 const Header = () => {
   const { cartItemCount } = useContext(CartContext);
@@ -225,6 +226,10 @@ const Header = () => {
                 </div>
               </label>
 
+              <Link to="/user/wishlist" className="icon-action-btn" title="Mục yêu thích">
+                <AnimatedHeart checked={true} width="22px" height="22px" />
+              </Link>
+
               <button 
                 className="icon-action-btn" 
                 onClick={() => setIsCartOpen(true)}
@@ -317,7 +322,7 @@ const Header = () => {
             <nav className="nav-links">
               <Link to="/" className="nav-link">Trang chủ</Link>
               <Link to="/product" className="nav-link">Tất cả sản phẩm</Link>
-              <Link to="/product?sale=true" className="nav-link hot-link">Khuyến mãi 🔥</Link>
+              <Link to="/sale" className="nav-link hot-link">Khuyến mãi 🔥</Link>
               <Link to="/post" className="nav-link">Blog & Tin tức</Link>
             </nav>
           </div>

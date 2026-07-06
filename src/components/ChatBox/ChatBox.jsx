@@ -50,7 +50,25 @@ const ChatBox = () => {
       });
       setMessages(prev => [...prev, { sender: 'bot', text: res.data.response }]);
     } catch (error) {
-      setMessages(prev => [...prev, { sender: 'bot', text: 'Xin lỗi, hệ thống AI đang bận hoặc gặp sự cố kết nối tới Ollama. Hãy đảm bảo Ollama đang chạy.' }]);
+      // Local Fallback Mode
+      const lowerInput = userMsg.text.toLowerCase();
+      let fallbackText = '';
+      
+      if (lowerInput.includes('giày nam') || lowerInput.includes('nam')) {
+        fallbackText = 'Hiện tại cửa hàng đang có rất nhiều mẫu **Giày Thể Thao Nam** cực chất. Bạn có thể ghé thăm danh mục "Giày Nam" hoặc trang "Tất cả sản phẩm" để xem nhé!';
+      } else if (lowerInput.includes('giày nữ') || lowerInput.includes('nữ')) {
+        fallbackText = 'Các mẫu **Giày Nữ** đang có chương trình khuyến mãi hấp dẫn. Bạn hãy vào mục "Giày Nữ" trên thanh menu để chọn lựa nha.';
+      } else if (lowerInput.includes('giá') || lowerInput.includes('bao nhiêu')) {
+        fallbackText = 'Mức giá sản phẩm của Nova Store giao động từ **200.000đ đến 2.000.000đ** tùy mẫu mã. Bạn hãy bấm vào từng sản phẩm để xem chi tiết nhé.';
+      } else if (lowerInput.includes('chào') || lowerInput.includes('hello')) {
+        fallbackText = 'Chào bạn! Do hệ thống AI lõi đang bảo trì, tôi là trợ lý ảo cơ bản (Local Mode) tạm thời phục vụ bạn. Bạn cần tìm giày gì nào?';
+      } else if (lowerInput.includes('cảm ơn') || lowerInput.includes('thanks')) {
+        fallbackText = 'Không có gì! Nova Store luôn sẵn sàng hỗ trợ bạn. Chúc bạn mua sắm vui vẻ!';
+      } else {
+        fallbackText = '⚠️ **(Local Mode)**: Hệ thống AI Ollama đang tắt nên tôi tạm thời trả lời theo mẫu cơ bản. Tôi có thể hiểu các từ khóa như: "giày nam", "giày nữ", "giá cả". Bạn hãy thử lại xem sao nhé!';
+      }
+
+      setMessages(prev => [...prev, { sender: 'bot', text: fallbackText }]);
     } finally {
       setLoading(false);
     }

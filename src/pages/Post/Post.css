@@ -290,3 +290,12 @@
   .post-detail-content { padding: 2rem 1.5rem; }
   .post-detail-footer { padding: 1.5rem; }
 }
+
+/* Voice Reader Styles */
+.voice-reader-controls { display: flex; gap: 10px; margin-top: 10px; }
+.btn-voice { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--primary); background: transparent; color: var(--primary); border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all 0.3s ease; }
+.btn-voice:hover { background: var(--primary); color: white; }
+.voice-active-controls { display: flex; gap: 8px; }
+.btn-voice.active { background: var(--primary); color: white; }
+.btn-voice.stop { border-color: #ef4444; color: #ef4444; }
+.btn-voice.stop:hover { background: #ef4444; color: white; }

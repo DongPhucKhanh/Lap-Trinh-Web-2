@@ -44,6 +44,8 @@ const Checkout = () => {
 
   const finalTotal = checkoutTotal - discountAmount > 0 ? checkoutTotal - discountAmount : 0;
 
+  const [useDefaultAddress, setUseDefaultAddress] = useState(false);
+
   // Pre-fill user data
   useEffect(() => {
     if (user) {
@@ -54,6 +56,9 @@ const Checkout = () => {
         deliveryPhone: user.phone || '',
         deliveryAddress: user.address || ''
       }));
+      if (user.address) {
+        setUseDefaultAddress(true);
+      }
     }
   }, [user]);
   
@@ -173,7 +178,9 @@ const Checkout = () => {
         items: checkoutCart.map(item => ({
           productId: item.id || item.product?.id,
           qty: item.quantity,
-          discount: 0
+          discount: 0,
+          variantColor: item.selectedColor || null,
+          variantSize: item.selectedSize || null
         }))
       };
 
@@ -275,15 +282,63 @@ const Checkout = () => {
 
             <div className="form-group">
               <label>Địa chỉ nhận hàng *</label>
-              <input 
-                type="text" 
-                name="deliveryAddress" 
-                value={formData.deliveryAddress} 
-                onChange={handleChange} 
-                placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/TP" 
-                className={formErrors.deliveryAddress ? 'input-error' : ''}
-              />
-              {formErrors.deliveryAddress && <span className="error-text">{formErrors.deliveryAddress}</span>}
+
+              {user && user.address && (
+                <div className="address-toggle" style={{display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '15px'}}>
+                  <label style={{display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: '500'}}>
+                    <input 
+                      type="radio" 
+                      name="addressType"
+                      checked={useDefaultAddress} 
+                      onChange={() => {
+                        setUseDefaultAddress(true);
+                        setFormData(prev => ({
+                          ...prev, 
+                          deliveryAddress: user.address, 
+                          deliveryName: user.name || prev.deliveryName, 
+                          deliveryPhone: user.phone || prev.deliveryPhone
+                        }));
+                        if (formErrors.deliveryAddress) setFormErrors(prev => ({ ...prev, deliveryAddress: '' }));
+                      }} 
+                    /> 
+                    Sử dụng địa chỉ cố định (Mặc định của tài khoản)
+                  </label>
+                  
+                  {useDefaultAddress && (
+                    <div className="default-address-box" style={{marginLeft: '22px', padding: '12px 16px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '0.9rem', color: '#334155'}}>
+                      <div style={{fontWeight: '600', marginBottom: '4px'}}>{user.name || formData.deliveryName} - {user.phone || formData.deliveryPhone}</div>
+                      <div>{user.address}</div>
+                    </div>
+                  )}
+
+                  <label style={{display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: '500'}}>
+                    <input 
+                      type="radio" 
+                      name="addressType"
+                      checked={!useDefaultAddress} 
+                      onChange={() => {
+                        setUseDefaultAddress(false);
+                        setFormData(prev => ({...prev, deliveryAddress: ''}));
+                      }} 
+                    /> 
+                    Giao đến địa chỉ nhận hàng khác
+                  </label>
+                </div>
+              )}
+
+              {(!user || !user.address || !useDefaultAddress) && (
+                <>
+                  <input 
+                    type="text" 
+                    name="deliveryAddress" 
+                    value={formData.deliveryAddress} 
+                    onChange={handleChange} 
+                    placeholder="Nhập chi tiết: Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/TP" 
+                    className={formErrors.deliveryAddress ? 'input-error' : ''}
+                  />
+                  {formErrors.deliveryAddress && <span className="error-text">{formErrors.deliveryAddress}</span>}
+                </>
+              )}
             </div>
 
             <div className="form-group">

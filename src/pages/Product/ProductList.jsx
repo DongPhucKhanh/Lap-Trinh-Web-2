@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Filter, Search, Grid, List as ListIcon } from 'lucide-react';
+import { Filter, Search, Grid, List as ListIcon, ChevronDown, ChevronRight } from 'lucide-react';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import Pagination from '../../components/Pagination/Pagination';
@@ -10,14 +10,14 @@ import { AuthContext } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
 import './ProductList.css';
 
-const ProductList = () => {
+const ProductList = ({ isSalePage = false }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
   const initialSearch = searchParams.get('search') || '';
   const initialCategory = searchParams.get('category') || '';
   const initialPage = parseInt(searchParams.get('page')) || 1;
-  const initialSale = searchParams.get('sale') === 'true';
+  const initialSale = isSalePage || searchParams.get('sale') === 'true';
 
   const { user } = useContext(AuthContext);
 
@@ -30,7 +30,8 @@ const ProductList = () => {
     search: initialSearch, 
     sort: 'id', // Default sort by id in backend
     direction: 'desc',
-    saleOnly: initialSale
+    saleOnly: initialSale,
+    maxPrice: 15000000
   });
   
   const [viewMode, setViewMode] = useState('grid');
@@ -41,6 +42,9 @@ const ProductList = () => {
 
   // Favorites
   const [favorites, setFavorites] = useState(new Set());
+
+  // Expanded Categories
+  const [expandedCats, setExpandedCats] = useState({});
 
   // Quick View
   const [quickViewProduct, setQuickViewProduct] = useState(null);
@@ -65,14 +69,19 @@ const ProductList = () => {
   }, [user]);
 
   useEffect(() => {
-    fetchProducts();
+    // Add a small delay for price slider to avoid fetching too many times while sliding
+    const delayDebounceFn = setTimeout(() => {
+      fetchProducts();
+    }, 300);
+    return () => clearTimeout(delayDebounceFn);
   }, [filter, currentPage]);
 
   const fetchProducts = () => {
     setLoading(true);
+    const requiresLocalFilter = filter.saleOnly || filter.maxPrice < 15000000;
     const params = {
-      page: filter.saleOnly ? 0 : currentPage - 1,
-      size: filter.saleOnly ? 1000 : itemsPerPage,
+      page: requiresLocalFilter ? 0 : currentPage - 1,
+      size: requiresLocalFilter ? 1000 : itemsPerPage,
       sort: filter.sort,
       direction: filter.direction
     };
@@ -82,17 +91,26 @@ const ProductList = () => {
     api.get('/products/search', { params })
       .then(res => {
         let content = res.data.content || res.data;
-        // Client-side filter for saleOnly since API might not support it directly
-        if (filter.saleOnly) {
-          content = content.filter(p => p.productSale && p.productSale.pricesale);
+        
+        // Client-side filtering
+        if (requiresLocalFilter) {
+          if (filter.saleOnly) {
+            content = content.filter(p => p.productSale && p.productSale.pricesale);
+          }
+          if (filter.maxPrice < 15000000) {
+            content = content.filter(p => {
+              const actualPrice = p.productSale?.pricesale || p.price;
+              return actualPrice <= filter.maxPrice;
+            });
+          }
           
-          // Local pagination for sale products
+          // Local pagination
           const start = (currentPage - 1) * itemsPerPage;
           const paginatedContent = content.slice(start, start + itemsPerPage);
           
           setProducts(paginatedContent);
           setTotalElements(content.length);
-          setTotalPages(Math.ceil(content.length / itemsPerPage));
+          setTotalPages(Math.ceil(content.length / itemsPerPage) || 1);
         } else {
           setProducts(content);
           setTotalPages(res.data.totalPages || 1);
@@ -143,14 +161,14 @@ const ProductList = () => {
   };
 
   const breadcrumbItems = [
-    { label: 'Sản phẩm', link: null }
+    { label: isSalePage ? 'Khuyến mãi' : 'Sản phẩm', link: null }
   ];
 
   return (
     <div className="product-list-page">
       <div className="page-header-banner">
-        <h1>Bộ Sưu Tập Giày Thể Thao</h1>
-        <p>Hàng trăm mẫu giày đang chờ bạn khám phá</p>
+        <h1>{isSalePage ? 'Khuyến Mãi Khủng' : 'Bộ Sưu Tập Giày Thể Thao'}</h1>
+        <p>{isSalePage ? 'Săn ngay những deal cực sốc với giá tốt nhất' : 'Hàng trăm mẫu giày đang chờ bạn khám phá'}</p>
       </div>
 
       <div className="product-list-container">
@@ -179,40 +197,82 @@ const ProductList = () => {
               >
                 Tất cả đôi giày
               </li>
-              {categories.filter(cat => !cat.parentId).map(parent => (
-                <React.Fragment key={parent.id}>
-                  <li 
-                    className={`parent-category ${filter.categoryId === parent.id.toString() ? 'active' : ''}`}
-                    onClick={() => { setFilter(prev => ({...prev, categoryId: parent.id.toString()})); setCurrentPage(1); }}
-                  >
-                    {parent.name}
-                  </li>
-                  {categories.filter(cat => cat.parentId === parent.id).map(child => (
-                    <li 
-                      key={child.id}
-                      className={`child-category ${filter.categoryId === child.id.toString() ? 'active' : ''}`}
-                      onClick={() => { setFilter(prev => ({...prev, categoryId: child.id.toString()})); setCurrentPage(1); }}
-                    >
-                      {child.name}
+              {categories.filter(cat => !cat.parentId).map(parent => {
+                const hasChildren = categories.some(cat => cat.parentId === parent.id);
+                const isExpanded = expandedCats[parent.id];
+                
+                return (
+                  <React.Fragment key={parent.id}>
+                    <li className={`parent-category ${filter.categoryId === parent.id.toString() ? 'active' : ''}`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span 
+                        style={{ flex: 1 }}
+                        onClick={() => { setFilter(prev => ({...prev, categoryId: parent.id.toString()})); setCurrentPage(1); }}
+                      >
+                        {parent.name}
+                      </span>
+                      {hasChildren && (
+                        <span 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedCats(prev => ({...prev, [parent.id]: !prev[parent.id]}));
+                          }}
+                          style={{ padding: '0 8px', cursor: 'pointer' }}
+                        >
+                          {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                        </span>
+                      )}
                     </li>
-                  ))}
-                </React.Fragment>
-              ))}
+                    {hasChildren && isExpanded && categories.filter(cat => cat.parentId === parent.id).map(child => (
+                      <li 
+                        key={child.id}
+                        className={`child-category ${filter.categoryId === child.id.toString() ? 'active' : ''}`}
+                        onClick={() => { setFilter(prev => ({...prev, categoryId: child.id.toString()})); setCurrentPage(1); }}
+                      >
+                        {child.name}
+                      </li>
+                    ))}
+                  </React.Fragment>
+                );
+              })}
             </ul>
           </div>
 
           <div className="filter-block">
-            <h3>Lọc thêm</h3>
-            <label className="checkbox-label">
+            <h3>Mức giá</h3>
+            <div style={{ padding: '10px 0' }}>
               <input 
-                type="checkbox" 
-                name="saleOnly"
-                checked={filter.saleOnly}
-                onChange={handleFilterChange}
+                type="range" 
+                min="0" 
+                max="15000000" 
+                step="100000" 
+                value={filter.maxPrice} 
+                onChange={(e) => {
+                  setFilter(prev => ({...prev, maxPrice: parseInt(e.target.value)}));
+                  setCurrentPage(1);
+                }}
+                style={{ width: '100%', cursor: 'pointer' }}
               />
-              Chỉ hiện hàng Khuyến mãi
-            </label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '14px', color: '#555' }}>
+                <span>0đ</span>
+                <span>{filter.maxPrice >= 15000000 ? 'Tất cả' : `Dưới ${new Intl.NumberFormat('vi-VN').format(filter.maxPrice)}đ`}</span>
+              </div>
+            </div>
           </div>
+
+          {!isSalePage && (
+            <div className="filter-block">
+              <h3>Lọc thêm</h3>
+              <label className="checkbox-label">
+                <input 
+                  type="checkbox" 
+                  name="saleOnly"
+                  checked={filter.saleOnly}
+                  onChange={handleFilterChange}
+                />
+                Chỉ hiện hàng Khuyến mãi
+              </label>
+            </div>
+          )}
         </aside>
 
         {/* Main Content */}

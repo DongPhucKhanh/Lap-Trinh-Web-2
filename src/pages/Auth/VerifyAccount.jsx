@@ -112,79 +112,148 @@ const VerifyAccount = () => {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-container" style={{ maxWidth: '480px' }}>
-        <div className="auth-header">
-          <div className="auth-icon-wrapper">
-            <ShieldCheck size={32} color="#ff6b6b" />
+    <div className="auth-page-premium">
+      <div className="auth-split-layout">
+        
+        {/* LEFT SIDE: STORYTELLING HERO */}
+        <div className="auth-hero-section">
+          <div className="auth-hero-bg"></div>
+          <div className="auth-hero-overlay"></div>
+          
+          <div className="auth-floating-element auth-float-1">
+            <img src="https://placehold.co/100x100/transparent/fff?text=👟" alt="sneaker" style={{width: '60px', filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.3))'}} />
           </div>
-          <h2>Xác thực tài khoản</h2>
-          <p>Nhập mã OTP gồm 6 chữ số đã gửi đến</p>
-          <div style={{ 
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-            background: '#f1f5f9', padding: '8px 16px', borderRadius: '8px', marginTop: '10px'
-          }}>
-            <Mail size={16} color="#64748b" />
-            <span style={{ fontWeight: 700, color: '#334155' }}>{email}</span>
+          <div className="auth-floating-element auth-float-2">
+            <img src="https://placehold.co/100x100/transparent/fff?text=🔥" alt="fire" style={{width: '80px', filter: 'drop-shadow(0 10px 10px rgba(0,0,0,0.3))'}} />
+          </div>
+
+          <div className="auth-hero-content">
+            <div className="auth-brand">
+              <div className="auth-brand-logo">
+                <span style={{color: 'white', fontWeight: 900, fontSize: '20px'}}>S</span>
+              </div>
+              Nova Store
+            </div>
+
+            <div className="auth-hero-text">
+              <h1>Bảo Mật Tối Đa<br/>Cho Tài Khoản Của Bạn</h1>
+              <p>Chúng tôi ưu tiên bảo vệ thông tin cá nhân của bạn. Vui lòng xác thực email để hoàn tất quá trình đăng ký và bắt đầu trải nghiệm mua sắm.</p>
+              
+              <div className="auth-hero-badges">
+                <div className="hero-badge"><ShieldCheck size={18} color="#60a5fa" /> Bảo Mật 2 Lớp</div>
+                <div className="hero-badge"><Mail size={18} color="#fcd34d" /> Xác Minh Nhanh Chóng</div>
+              </div>
+            </div>
+
+            <div className="auth-hero-stats">
+              {/* Optional empty space or other stats */}
+            </div>
           </div>
         </div>
 
-        {error && <div className="auth-error">{error}</div>}
-        {success && <div className="auth-success">{success}</div>}
+        {/* RIGHT SIDE: AUTH CARD */}
+        <div className="auth-form-section">
+          <div className="auth-premium-card" style={{ maxWidth: '520px' }}>
+            <div className="auth-card-header">
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                <div style={{ 
+                  background: 'var(--auth-primary-glow)', width: '80px', height: '80px', 
+                  borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <ShieldCheck size={40} color="var(--auth-primary)" />
+                </div>
+              </div>
+              <h2>Xác thực tài khoản</h2>
+              <p>Nhập mã OTP gồm 6 chữ số đã gửi đến</p>
+              <div style={{ 
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                background: '#f8fafc', padding: '10px 16px', borderRadius: '8px', marginTop: '16px',
+                border: '1px solid var(--auth-border)'
+              }}>
+                <Mail size={18} color="var(--auth-text-muted)" />
+                <span style={{ fontWeight: 700, color: 'var(--auth-text-dark)' }}>{email}</span>
+              </div>
+            </div>
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div style={{
-            display: 'flex', gap: '10px', justifyContent: 'center', margin: '10px 0 20px'
-          }}>
-            {otp.map((digit, i) => (
-              <input
-                key={i}
-                ref={(el) => (inputRefs.current[i] = el)}
-                type="text"
-                inputMode="numeric"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleChange(i, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(i, e)}
-                onPaste={i === 0 ? handlePaste : undefined}
-                style={{
-                  width: '52px', height: '60px',
-                  textAlign: 'center', fontSize: '24px', fontWeight: 700,
-                  border: '2px solid #e2e8f0', borderRadius: '12px',
-                  outline: 'none', transition: 'all 0.2s',
-                  background: digit ? '#fff5f5' : 'white',
-                  borderColor: digit ? '#ff6b6b' : '#e2e8f0',
-                  color: '#1a1a2e',
-                  fontFamily: 'inherit'
-                }}
-                onFocus={(e) => { e.target.style.borderColor = '#ff6b6b'; e.target.style.boxShadow = '0 0 0 3px rgba(255,107,107,0.15)'; }}
-                onBlur={(e) => { e.target.style.borderColor = digit ? '#ff6b6b' : '#e2e8f0'; e.target.style.boxShadow = 'none'; }}
-              />
-            ))}
+            {error && (
+              <div className="premium-alert error">
+                <ShieldCheck size={18} /> {error}
+              </div>
+            )}
+            
+            {success && (
+              <div className="premium-alert success">
+                <ShieldCheck size={18} /> {success}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="premium-form">
+              <div style={{
+                display: 'flex', gap: '12px', justifyContent: 'center', margin: '20px 0 30px'
+              }}>
+                {otp.map((digit, i) => (
+                  <input
+                    key={i}
+                    ref={(el) => (inputRefs.current[i] = el)}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleChange(i, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(i, e)}
+                    onPaste={i === 0 ? handlePaste : undefined}
+                    style={{
+                      width: '56px', height: '64px',
+                      textAlign: 'center', fontSize: '28px', fontWeight: 700,
+                      border: '2px solid var(--auth-border)', borderRadius: '12px',
+                      outline: 'none', transition: 'all 0.2s',
+                      background: digit ? 'var(--auth-primary-glow)' : 'transparent',
+                      borderColor: digit ? 'var(--auth-primary)' : 'var(--auth-border)',
+                      color: 'var(--auth-primary)',
+                      fontFamily: 'inherit',
+                      boxShadow: digit ? '0 4px 12px rgba(249, 115, 22, 0.1)' : 'none'
+                    }}
+                    onFocus={(e) => { 
+                      e.target.style.borderColor = 'var(--auth-primary)'; 
+                      e.target.style.boxShadow = '0 0 0 4px var(--auth-primary-glow)'; 
+                      e.target.style.transform = 'translateY(-2px)';
+                    }}
+                    onBlur={(e) => { 
+                      e.target.style.borderColor = digit ? 'var(--auth-primary)' : 'var(--auth-border)'; 
+                      e.target.style.boxShadow = digit ? '0 4px 12px rgba(249, 115, 22, 0.1)' : 'none'; 
+                      e.target.style.transform = 'translateY(0)';
+                    }}
+                  />
+                ))}
+              </div>
+
+              <button type="submit" className="premium-submit-btn" disabled={loading}>
+                {loading ? 'ĐANG XÁC THỰC...' : 'XÁC THỰC TÀI KHOẢN'}
+              </button>
+            </form>
+
+            <div className="auth-card-footer" style={{ marginTop: '30px' }}>
+              <p>Chưa nhận được mã?</p>
+              {countdown > 0 ? (
+                <span style={{ color: 'var(--auth-text-muted)', fontWeight: 600 }}>Gửi lại sau {countdown}s</span>
+              ) : (
+                <button
+                  onClick={handleResend}
+                  disabled={resendLoading}
+                  style={{
+                    background: 'none', border: 'none', color: 'var(--auth-primary)',
+                    fontWeight: 700, cursor: 'pointer', fontSize: '1rem',
+                    fontFamily: 'inherit', textDecoration: 'none',
+                    display: 'inline-flex', alignItems: 'center', gap: '6px'
+                  }}
+                  onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
+                  onMouseOut={(e) => e.target.style.textDecoration = 'none'}
+                >
+                  {resendLoading ? 'Đang gửi...' : 'Gửi lại mã OTP'}
+                </button>
+              )}
+            </div>
           </div>
-
-          <button type="submit" className="btn-auth-submit" disabled={loading}>
-            {loading ? 'ĐANG XÁC THỰC...' : 'XÁC THỰC TÀI KHOẢN'}
-          </button>
-        </form>
-
-        <div style={{ textAlign: 'center', marginTop: '24px', color: '#64748b', fontSize: '0.95rem' }}>
-          Chưa nhận được mã?{' '}
-          {countdown > 0 ? (
-            <span style={{ color: '#94a3b8' }}>Gửi lại sau {countdown}s</span>
-          ) : (
-            <button
-              onClick={handleResend}
-              disabled={resendLoading}
-              style={{
-                background: 'none', border: 'none', color: '#ff6b6b',
-                fontWeight: 700, cursor: 'pointer', fontSize: 'inherit',
-                fontFamily: 'inherit', textDecoration: 'underline'
-              }}
-            >
-              {resendLoading ? 'Đang gửi...' : 'Gửi lại mã OTP'}
-            </button>
-          )}
         </div>
       </div>
     </div>

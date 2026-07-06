@@ -42,6 +42,9 @@ public class OrderController {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private com.dongphuckhanh.ltw2.repository.ProductVariantRepository productVariantRepository;
+
     // ============================================================
     // 1. Lấy tất cả đơn hàng (dành cho Admin)
     // ============================================================
@@ -150,6 +153,9 @@ public class OrderController {
             BigDecimal discount = item.get("discount") != null
                     ? new BigDecimal(item.get("discount").toString())
                     : BigDecimal.ZERO;
+            
+            String variantColor = item.get("variantColor") != null ? item.get("variantColor").toString() : null;
+            String variantSize = item.get("variantSize") != null ? item.get("variantSize").toString() : null;
 
             Optional<Product> productOpt = productRepository.findById(productId);
             if (productOpt.isEmpty()) {
@@ -164,12 +170,29 @@ public class OrderController {
                 price = product.getProductSale().getPricesale();
             }
 
+            // Kiểm tra và trừ số lượng Biến thể (nếu có chọn màu/size)
+            if (variantColor != null && variantSize != null && !variantColor.trim().isEmpty() && !variantSize.trim().isEmpty()) {
+                Optional<com.dongphuckhanh.ltw2.entity.ProductVariant> variantOpt = productVariantRepository.findByProductIdAndColorAndSize(productId, variantColor, variantSize);
+                
+                if (variantOpt.isPresent()) {
+                    com.dongphuckhanh.ltw2.entity.ProductVariant variant = variantOpt.get();
+                    if (variant.getQty() < qty) {
+                        orderRepository.delete(savedOrder);
+                        return ResponseEntity.badRequest()
+                                .body("Sản phẩm " + product.getName() + " (Màu: " + variantColor + " - Size: " + variantSize + ") không đủ số lượng!");
+                    }
+                    variant.setQty(variant.getQty() - qty);
+                    productVariantRepository.save(variant);
+                }
+            }
+
+            // Trừ số lượng Tổng kho
             if (product.getProductStore() != null) {
                 int currentQty = product.getProductStore().getQty();
                 if (currentQty < qty) {
                     orderRepository.delete(savedOrder);
                     return ResponseEntity.badRequest()
-                            .body("Sản phẩm " + product.getName() + " không đủ số lượng!");
+                            .body("Sản phẩm " + product.getName() + " không đủ số lượng tổng!");
                 }
                 product.getProductStore().setQty(currentQty - qty);
                 productRepository.save(product);
@@ -178,6 +201,8 @@ public class OrderController {
             OrderDetail detail = new OrderDetail();
             detail.setOrder(savedOrder);
             detail.setProduct(product);
+            detail.setVariantColor(variantColor);
+            detail.setVariantSize(variantSize);
             detail.setPrice(price);
             detail.setQty(qty);
             detail.setDiscount(discount);
@@ -233,10 +258,35 @@ public class OrderController {
 
         return orderRepository.findById(id)
                 .map(order -> {
-                    order.setStatus(newStatus);
                     if (newStatus == 6 || newStatus == 7) {
                         order.setCancelReason(cancelReason);
+                        
+                        // Hoàn trả lại số lượng kho
+                        if (order.getStatus() != 6 && order.getStatus() != 7) {
+                            List<OrderDetail> details = orderDetailRepository.findByOrderId(order.getId());
+                            for (OrderDetail detail : details) {
+                                // 1. Hoàn trả cho Variant (nếu có)
+                                if (detail.getVariantColor() != null && detail.getVariantSize() != null) {
+                                    productVariantRepository.findByProductIdAndColorAndSize(
+                                            detail.getProduct().getId(), 
+                                            detail.getVariantColor(), 
+                                            detail.getVariantSize()
+                                    ).ifPresent(variant -> {
+                                        variant.setQty(variant.getQty() + detail.getQty());
+                                        productVariantRepository.save(variant);
+                                    });
+                                }
+                                
+                                // 2. Hoàn trả cho ProductStore (tổng)
+                                Product p = detail.getProduct();
+                                if (p.getProductStore() != null) {
+                                    p.getProductStore().setQty(p.getProductStore().getQty() + detail.getQty());
+                                    productRepository.save(p);
+                                }
+                            }
+                        }
                     }
+                    order.setStatus(newStatus);
                     Order updatedOrder = orderRepository.save(order);
                     
                     // Gửi email thông báo thay đổi trạng thái

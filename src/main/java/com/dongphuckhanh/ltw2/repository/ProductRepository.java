@@ -35,8 +35,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     /** Tìm kiếm cho Admin bỏ qua trạng thái xóa mềm (-1) */
     Page<Product> findByNameContainingIgnoreCaseAndCategoryIdAndStatusNot(String name, Long categoryId, Integer status, Pageable pageable);
+    Page<Product> findByNameContainingIgnoreCaseAndCategoryIdInAndStatusNot(String name, List<Long> categoryIds, Integer status, Pageable pageable);
     Page<Product> findByNameContainingIgnoreCaseAndStatusNot(String name, Integer status, Pageable pageable);
     Page<Product> findByCategoryIdAndStatusNot(Long categoryId, Integer status, Pageable pageable);
+    Page<Product> findByCategoryIdInAndStatusNot(List<Long> categoryIds, Integer status, Pageable pageable);
 
     /** Tìm sản phẩm theo CategoryId và trạng thái, có phân trang */
     Page<Product> findByCategoryIdAndStatus(Long categoryId, Integer status, Pageable pageable);

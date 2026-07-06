@@ -29,18 +29,19 @@ public class ChatController {
         this.restTemplate = new RestTemplate(factory);
     }
 
-    private final String OLLAMA_URL = "http://localhost:11434/api/generate";
+    private final String OLLAMA_URL = "http://localhost:11434/api/chat";
     private final String MODEL_NAME = "qwen2.5:1.5b";
 
     @Autowired
     private ProductRepository productRepository;
 
-    // Lưu lịch sử hội thoại theo session (in-memory).
-    // LƯU Ý: chỉ phù hợp demo/dev. Lên production nên chuyển sang Redis hoặc bảng DB,
-    // vì Map này sẽ mất dữ liệu khi restart server và không scale khi chạy nhiều instance.
-    private final Map<String, List<String>> sessionHistory = new ConcurrentHashMap<>();
+    @Autowired
+    private com.dongphuckhanh.ltw2.repository.CategoryRepository categoryRepository;
 
-    // Số lượt hội thoại gần nhất được đưa vào prompt (1 lượt = 1 câu khách + 1 câu bot)
+    // Lưu lịch sử hội thoại theo session (in-memory).
+    private final Map<String, List<Map<String, String>>> sessionHistory = new ConcurrentHashMap<>();
+
+    // Số lượt hội thoại gần nhất được đưa vào prompt
     private static final int MAX_HISTORY_TURNS = 6;
 
     @PostMapping
@@ -55,30 +56,67 @@ public class ChatController {
             return ResponseEntity.badRequest().body(Map.of("error", "sessionId is required"));
         }
 
-        List<String> history = sessionHistory.computeIfAbsent(sessionId, k -> new ArrayList<>());
+        List<Map<String, String>> history = sessionHistory.computeIfAbsent(sessionId, k -> new ArrayList<>());
 
-        // Chỉ lấy N dòng gần nhất để tránh prompt quá dài (model nhỏ context hạn chế)
-        int fromIndex = Math.max(0, history.size() - MAX_HISTORY_TURNS * 2);
-        String historyContext = history.subList(fromIndex, history.size()).isEmpty()
-                ? "(chưa có)"
-                : String.join("\n", history.subList(fromIndex, history.size()));
-
-        // Formatter cho giá tiền kiểu VN (VD: 3.829.000 ₫)
+        // Formatter cho giá tiền kiểu VN
         java.text.NumberFormat formatter = java.text.NumberFormat.getInstance(new Locale("vi", "VN"));
 
+        List<com.dongphuckhanh.ltw2.entity.Category> allCategories = categoryRepository.findAll();
+        Map<Long, String> categoryNames = allCategories.stream().collect(Collectors.toMap(com.dongphuckhanh.ltw2.entity.Category::getId, com.dongphuckhanh.ltw2.entity.Category::getName));
+
         List<Product> products = productRepository.findAll();
-        String productContext = products.stream()
+        long totalProducts = products.stream().filter(p -> p.getStatus() != null && p.getStatus() == 1).count();
+        Map<String, List<Product>> groupedProducts = products.stream()
                 .filter(p -> p.getStatus() != null && p.getStatus() == 1)
-                .map(p -> "- " + p.getName() + " (Thương hiệu: " + (p.getBrand() != null ? p.getBrand().getName() : "Khác") + ", Giá: " + formatter.format(p.getPrice()) + " ₫, Danh mục: "
-                        + (p.getCategory() != null ? p.getCategory().getName() : "Khác") + ")")
-                .collect(Collectors.joining("\n"));
+                .collect(Collectors.groupingBy(p -> {
+                    if (p.getCategory() == null) return "Khác";
+                    com.dongphuckhanh.ltw2.entity.Category cat = p.getCategory();
+                    if (cat.getParentId() != null && cat.getParentId() > 0) {
+                        String parentName = categoryNames.getOrDefault(cat.getParentId(), "");
+                        if (!parentName.isEmpty()) {
+                            return parentName + " / " + cat.getName();
+                        }
+                    }
+                    return cat.getName();
+                }));
 
-        String prompt = buildPrompt(productContext, historyContext, userMessage);
+        StringBuilder productContextBuilder = new StringBuilder();
+        groupedProducts.forEach((category, list) -> {
+            productContextBuilder.append("--- DANH MỤC: ").append(category.toUpperCase()).append(" ---\n");
+            list.forEach(p -> productContextBuilder.append("- ")
+                    .append(p.getName()).append(" (Giá: ")
+                    .append(formatter.format(p.getPrice())).append(" ₫)\n"));
+            productContextBuilder.append("\n");
+        });
+        String productContext = productContextBuilder.toString();
 
+        // 2. TẠO LỜI NHẮC (SYSTEM PROMPT) NHẬP VAI CHO AI GIỐNG MẪU
+        String systemPrompt = "Bạn là \"Trợ lý ảo Nova Store\", phục vụ khách hàng mua giày. Trả lời thân thiện bằng tiếng Việt.\n\n" +
+                "LỆNH TỐI CAO:\n" +
+                "1. Khi khách hàng chỉ gõ một từ khóa danh mục (ví dụ: 'giày nam', 'giày nữ', 'chạy bộ'), BẠN TUYỆT ĐỐI KHÔNG ĐƯỢC HỎI NGƯỢC LẠI (ví dụ: 'Bạn muốn tìm mẫu nào?').\n" +
+                "2. Bạn PHẢI NGAY LẬP TỨC LIỆT KÊ TẤT CẢ TOÀN BỘ CÁC SẢN PHẨM có trong danh mục đó. ĐÓ LÀ BẮT BUỘC.\n" +
+                "3. KHÔNG ĐƯỢC tóm tắt hay chỉ kể 1-2 mẫu đại diện! Phải copy đầy đủ tên tất cả sản phẩm của danh mục đó.\n\n" +
+                "SỐ LIỆU VÀ DANH SÁCH SẢN PHẨM HIỆN CÓ:\n" +
+                "- Tổng số sản phẩm: " + totalProducts + " sản phẩm.\n" +
+                "- Tình trạng: Tất cả đều CÒN HÀNG. Size: 22.5cm=36, 23.5cm=37.5.\n\n" +
+                productContext;
+
+        List<Map<String, String>> messages = new ArrayList<>();
+        messages.add(Map.of("role", "system", "content", systemPrompt));
+
+        // Nạp lịch sử
+        int fromIndex = Math.max(0, history.size() - MAX_HISTORY_TURNS * 2);
+        messages.addAll(history.subList(fromIndex, history.size()));
+
+        // Nạp câu hỏi mới
+        messages.add(Map.of("role", "user", "content", userMessage));
+
+        // 3. GỌI XUỐNG MÁY CHỦ OLLAMA
         Map<String, Object> ollamaRequest = new HashMap<>();
         ollamaRequest.put("model", MODEL_NAME);
-        ollamaRequest.put("prompt", prompt);
+        ollamaRequest.put("messages", messages);
         ollamaRequest.put("stream", false);
+        ollamaRequest.put("options", Map.of("temperature", 0.3));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -90,40 +128,22 @@ public class ChatController {
                 return ResponseEntity.status(500).body(Map.of("error", "Failed to get response from AI"));
             }
 
-            String aiResponse = (String) response.getBody().get("response");
+            Map<String, Object> messageObj = (Map<String, Object>) response.getBody().get("message");
+            String aiResponse = (String) messageObj.get("content");
 
-            // GẮN PRODUCT CARD cho các sản phẩm được nhắc tới trong câu trả lời
+            // GẮN PRODUCT CARD
             aiResponse = appendProductCards(aiResponse, products);
 
-            // Lưu lịch sử hội thoại
-            history.add("Khách: " + userMessage);
-            history.add("Bạn: " + aiResponse);
+            // Cập nhật lịch sử
+            history.add(Map.of("role", "user", "content", userMessage));
+            history.add(Map.of("role", "assistant", "content", aiResponse));
 
             return ResponseEntity.ok(Map.of("response", aiResponse));
 
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("error", "Ollama is not running or unreachable on port 11434"));
+            return ResponseEntity.status(500).body(Map.of("error", "Lỗi kết nối với Trợ lý AI Offline. Hãy kiểm tra xem màn hình đen Ollama còn chạy không nhé!"));
         }
-    }
-
-    private String buildPrompt(String productContext, String historyContext, String userMessage) {
-        return "Bạn là nhân viên bán hàng của SneakerHub. Xưng hô là 'em' và 'anh/chị'. Trả lời NGẮN GỌN, THÂN THIỆN BẰNG TIẾNG VIỆT.\n\n"
-                + "DANH SÁCH SẢN PHẨM HIỆN CÓ CỦA SHOP:\n" + productContext + "\n\n"
-                + "QUY TẮC TƯ VẤN:\n"
-                + "- Size giày: 22.5cm=36, 23.5cm=37.5, 25cm=40, 26cm=41, 27cm=42.5. Nike khuyên tăng 1 size.\n"
-                + "- Tồn kho: Tất cả đều CÒN HÀNG.\n"
-                + "- Đổi trả & Giao hàng: Đổi miễn phí 7 ngày. Freeship đơn > 2 triệu.\n\n"
-                + "--- VÍ DỤ CÁCH TRẢ LỜI MẪU ---\n"
-                + "Khách: Cho tôi xem giày chạy bộ nam\n"
-                + "Nhân viên: Dạ, bên em có các mẫu giày chạy bộ nam là Nike Pegasus 42 và Nike Air Zoom. Anh/chị ưng ý mẫu nào ạ?\n\n"
-                + "Khách: Có giày bóng rổ không\n"
-                + "Nhân viên: Dạ, shop em có các mẫu giày bóng rổ Nike LeBron 20, Adidas Harden Vol 7 và Puma MB.02 ạ. Anh/chị thích mẫu nào?\n"
-                + "--------------------------------\n\n"
-                + "LỊCH SỬ HỘI THOẠI:\n" + historyContext + "\n\n"
-                + "Lệnh: Dựa vào Danh sách sản phẩm trên, hãy CHỌN LỌC những sản phẩm đúng Danh mục để giới thiệu cho khách bằng văn xuôi. TUYỆT ĐỐI không copy nguyên xi định dạng danh sách. TUYỆT ĐỐI không giới thiệu sai danh mục (VD: Khách tìm giày đá bóng thì không giới thiệu giày bóng rổ). LUÔN VIẾT TÊN SẢN PHẨM ĐẦY ĐỦ để hệ thống hiện ảnh.\n"
-                + "Khách hàng nói: " + userMessage + "\n"
-                + "Nhân viên:";
     }
 
     private String appendProductCards(String aiResponse, List<Product> products) {

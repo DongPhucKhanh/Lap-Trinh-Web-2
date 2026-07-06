@@ -43,6 +43,12 @@ public class ContactController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // Lấy các câu trả lời cho một liên hệ
+    @GetMapping("/{id}/replies")
+    public ResponseEntity<List<Contact>> getRepliesByContact(@PathVariable Long id) {
+        return ResponseEntity.ok(contactRepository.findByReplyId(id));
+    }
+
     // 3. Lấy tất cả liên hệ của một User
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Contact>> getContactsByUser(@PathVariable Long userId) {

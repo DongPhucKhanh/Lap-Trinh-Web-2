@@ -153,7 +153,14 @@ const OrderDetail = () => {
                         src={item.product?.image ? (item.product.image.startsWith('http') ? item.product.image : `http://localhost:8080/uploads/${item.product.image}`) : 'https://placehold.co/40'} 
                         alt="" style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} 
                       />
-                      <span style={{ fontSize: '0.9rem' }}>{item.product?.name}</span>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span style={{ fontSize: '0.9rem', fontWeight: '500' }}>{item.product?.name}</span>
+                        {(item.variantColor || item.variantSize) && (
+                          <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                            {item.variantColor} {item.variantColor && item.variantSize && '-'} {item.variantSize}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td style={{ padding: '10px', textAlign: 'center', borderBottom: '1px solid #eee' }}>{item.qty}</td>
                     <td style={{ padding: '10px', textAlign: 'right', borderBottom: '1px solid #eee' }}>

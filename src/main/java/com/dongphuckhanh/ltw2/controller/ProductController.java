@@ -46,13 +46,24 @@ public class ProductController {
             : org.springframework.data.domain.Sort.by(sort).descending();
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size, sortObj);
         
+        List<Long> categoryIds = new java.util.ArrayList<>();
+        if (category != null) {
+            categoryIds.add(category);
+            List<com.dongphuckhanh.ltw2.entity.Category> children = categoryRepository.findByParentId(category);
+            if (children != null) {
+                for (com.dongphuckhanh.ltw2.entity.Category child : children) {
+                    categoryIds.add(child.getId());
+                }
+            }
+        }
+
         org.springframework.data.domain.Page<?> result;
         if (keyword != null && !keyword.isEmpty() && category != null) {
-            result = productRepository.findByNameContainingIgnoreCaseAndCategoryIdAndStatusNot(keyword, category, -1, pageable);
+            result = productRepository.findByNameContainingIgnoreCaseAndCategoryIdInAndStatusNot(keyword, categoryIds, -1, pageable);
         } else if (keyword != null && !keyword.isEmpty()) {
             result = productRepository.findByNameContainingIgnoreCaseAndStatusNot(keyword, -1, pageable);
         } else if (category != null) {
-            result = productRepository.findByCategoryIdAndStatusNot(category, -1, pageable);
+            result = productRepository.findByCategoryIdInAndStatusNot(categoryIds, -1, pageable);
         } else {
             result = productRepository.findByStatusNot(-1, pageable);
         }

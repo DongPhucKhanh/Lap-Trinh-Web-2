@@ -17,14 +17,14 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     /** Lấy tất cả liên hệ của một user */
     List<Contact> findByUserIdOrderByCreatedAtDesc(Long userId);
 
+    /** Lấy các liên hệ là phản hồi cho một liên hệ gốc */
+    List<Contact> findByReplyId(Long replyId);
+
     /** Lấy liên hệ theo trạng thái (0=chưa đọc, 1=đã đọc, 2=đã trả lời) */
     List<Contact> findByStatusOrderByCreatedAtDesc(Integer status);
 
     /** Đếm số liên hệ chưa đọc */
     Long countByStatus(Integer status);
-
-    /** Lấy tất cả phản hồi của một contact gốc */
-    List<Contact> findByReplyId(Long replyId);
 
     /** Tìm kiếm liên hệ theo email hoặc tiêu đề */
     @Query("""

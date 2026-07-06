@@ -29,6 +29,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findByStatusOrderBySortOrderAsc(Integer status);
 
     /** Lấy danh sách danh mục con theo parentId */
+    List<Category> findByParentId(Long parentId);
     List<Category> findByParentIdAndStatus(Long parentId, Integer status);
 
     /** Lấy tất cả danh mục gốc (parentId = null) */

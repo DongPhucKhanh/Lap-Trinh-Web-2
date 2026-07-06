@@ -8,6 +8,7 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.text.NumberFormat;
@@ -91,6 +92,7 @@ public class EmailService {
     }
 
     // 3. Email xác nhận đặt hàng thành công
+    @Async
     public void sendOrderConfirmation(String email, Order order, List<OrderDetail> details) {
         String subject = "Xác nhận đơn hàng #" + order.getId() + " - SneakerHub";
         
@@ -104,21 +106,43 @@ public class EmailService {
             if (amount != null) total = total.add(amount);
             
             String imgName = detail.getProduct().getImage();
-            String cid = "img_" + i;
+            String imgSrc = "";
+            
             if (imgName != null && !imgName.isEmpty()) {
-                inlineImages.put(cid, imgName);
+                // Nếu có nhiều ảnh cách nhau dấu phẩy, chỉ lấy ảnh đầu tiên
+                if (imgName.contains(",")) {
+                    imgName = imgName.split(",")[0].trim();
+                }
+
+                if (imgName.startsWith("http")) {
+                    imgSrc = imgName;
+                } else {
+                    String cid = "img_" + i;
+                    inlineImages.put(cid, imgName);
+                    imgSrc = "cid:" + cid;
+                }
             }
+            String variantInfo = "";
+            if (detail.getVariantColor() != null && !detail.getVariantColor().isEmpty()) {
+                variantInfo += " - Màu: " + detail.getVariantColor();
+            }
+            if (detail.getVariantSize() != null && !detail.getVariantSize().isEmpty()) {
+                variantInfo += " - Size: " + detail.getVariantSize();
+            }
+            String productNameWithVariant = detail.getProduct().getName() + variantInfo;
             
             itemsHtml.append(String.format("""
                 <tr>
-                    <td style="padding: 10px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
-                        <img src="cid:%s" alt="%s" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />
-                        <span>%s</span>
+                    <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <img src="%s" alt="%s" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />
+                            <span>%s</span>
+                        </div>
                     </td>
                     <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">%d</td>
                     <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">%s</td>
                 </tr>
-            """, cid, detail.getProduct().getName(), detail.getProduct().getName(), detail.getQty(), formatCurrency(amount)));
+            """, imgSrc, detail.getProduct().getName(), productNameWithVariant, detail.getQty(), formatCurrency(amount)));
         }
 
         String orderDate = order.getCreatedAt() != null 
@@ -177,6 +201,7 @@ public class EmailService {
     }
 
     // 4. Email thay đổi trạng thái đơn hàng
+    @Async
     public void sendOrderStatusChange(String email, Order order, int newStatus) {
         String statusText = "";
         String color = "#333";
@@ -246,21 +271,43 @@ public class EmailService {
                 if (amount != null) total = total.add(amount);
                 
                 String imgName = detail.getProduct().getImage();
-                String cid = "img_" + i;
+                String imgSrc = "";
+                
                 if (imgName != null && !imgName.isEmpty()) {
-                    inlineImages.put(cid, imgName);
+                    // Nếu có nhiều ảnh cách nhau dấu phẩy, chỉ lấy ảnh đầu tiên
+                    if (imgName.contains(",")) {
+                        imgName = imgName.split(",")[0].trim();
+                    }
+
+                    if (imgName.startsWith("http")) {
+                        imgSrc = imgName;
+                    } else {
+                        String cid = "img_" + i;
+                        inlineImages.put(cid, imgName);
+                        imgSrc = "cid:" + cid;
+                    }
                 }
+                String variantInfo = "";
+                if (detail.getVariantColor() != null && !detail.getVariantColor().isEmpty()) {
+                    variantInfo += " - Màu: " + detail.getVariantColor();
+                }
+                if (detail.getVariantSize() != null && !detail.getVariantSize().isEmpty()) {
+                    variantInfo += " - Size: " + detail.getVariantSize();
+                }
+                String productNameWithVariant = detail.getProduct().getName() + variantInfo;
                 
                 itemsHtml.append(String.format("""
                     <tr>
-                        <td style="padding: 10px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
-                            <img src="cid:%s" alt="%s" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />
-                            <span>%s</span>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <img src="%s" alt="%s" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;" />
+                                <span>%s</span>
+                            </div>
                         </td>
                         <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: center;">%d</td>
                         <td style="padding: 10px; border-bottom: 1px solid #eee; text-align: right;">%s</td>
                     </tr>
-                """, cid, detail.getProduct().getName(), detail.getProduct().getName(), detail.getQty(), formatCurrency(amount)));
+                """, imgSrc, detail.getProduct().getName(), productNameWithVariant, detail.getQty(), formatCurrency(amount)));
             }
         }
 
@@ -319,6 +366,7 @@ public class EmailService {
     }
 
     // 5. Email thông báo hủy 1 sản phẩm cụ thể
+    @Async
     public void sendItemCancellationNotice(String email, Order order, com.dongphuckhanh.ltw2.entity.OrderDetail deletedItem, String reason) {
         String subject = "Thông báo hủy 1 sản phẩm trong đơn hàng #" + order.getId() + " - SneakerHub";
         
@@ -332,6 +380,15 @@ public class EmailService {
         String orderDate = order.getCreatedAt() != null 
             ? order.getCreatedAt().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))
             : java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+
+        String variantInfo = "";
+        if (deletedItem.getVariantColor() != null && !deletedItem.getVariantColor().isEmpty()) {
+            variantInfo += " - Màu: " + deletedItem.getVariantColor();
+        }
+        if (deletedItem.getVariantSize() != null && !deletedItem.getVariantSize().isEmpty()) {
+            variantInfo += " - Size: " + deletedItem.getVariantSize();
+        }
+        String productNameWithVariant = deletedItem.getProduct().getName() + variantInfo;
 
         String htmlContent = """
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
@@ -368,13 +425,14 @@ public class EmailService {
         """.formatted(
             order.getDeliveryName(), order.getId(),
             order.getId(), orderDate, order.getDeliveryName(),
-            cid, deletedItem.getProduct().getName(), deletedItem.getProduct().getName(), deletedItem.getQty(), formatCurrency(deletedItem.getPrice()),
+            cid, deletedItem.getProduct().getName(), productNameWithVariant, deletedItem.getQty(), formatCurrency(deletedItem.getPrice()),
             reason
         );
         sendHtmlEmailWithInline(email, subject, htmlContent, inlineImages);
     }
 
     // 6. Email cảm ơn khách hàng gửi form liên hệ
+    @Async
     public void sendContactThankYou(String email, String customerName) {
         String subject = "SneakerHub đã nhận được tin nhắn của bạn!";
         String htmlContent = """
@@ -391,6 +449,7 @@ public class EmailService {
     }
 
     // 6. Email thông báo cho Admin khi có liên hệ mới
+    @Async
     public void sendContactNoticeToAdmin(String adminEmail, Contact contact) {
         String subject = "[Thông báo] Có liên hệ mới từ khách hàng: " + contact.getName();
         String dateStr = contact.getCreatedAt() != null 
